@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -39,7 +40,10 @@ fun ContentSplash(
             color = colorResource(R.color.green_primary),
             modifier = Modifier
                 .padding(bottom = 12.dp, start = 12.dp, end = 12.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                lineHeight = 40.sp,
+            )
         )
         Text(
             text = content,
@@ -54,7 +58,7 @@ fun ContentSplash(
 }
 
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun ContentSplashPreview(){
     ContentSplash(

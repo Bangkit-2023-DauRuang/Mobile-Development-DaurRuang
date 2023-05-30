@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -102,9 +103,10 @@ fun FirstScreen(
             ButtonLargePrimary(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 68.dp),
+                    .padding(top = 32.dp),
                 navigateButton = navigateButton,
-                title = "Next"
+                title = "NEXT",
+                fontWeight = FontWeight.Medium
             )
         }
 
@@ -145,14 +147,13 @@ fun SecondScreen(
                 .padding(top = 20.dp, start = 16.dp, end = 16.dp)
         ) {
             ContentSplash(
-                title = "Mudah Jual\n" +
-                        "Limbah\n" +
+                title = "Mudah Jual Limbah\n" +
                         "Lingkungan",
                 content = "Menjual sampah dengan tepat dan dapatkan uangnya")
 
             Row(
                 modifier = Modifier
-                    .padding(top = 68.dp)
+                    .padding(top = 32.dp)
             ) {
                 ButtonSmall(
                     navigateButton = navigateBack,
@@ -163,7 +164,8 @@ fun SecondScreen(
                         .padding(start = 8.dp)
                         .fillMaxWidth(),
                     navigateButton = navigateNext,
-                    title = "Next"
+                    title = "NEXT",
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -192,6 +194,7 @@ fun ThirdScreen(
             painter = painterResource(R.drawable.splash_image_third),
             contentDescription = stringResource(R.string.splash_image))
     }
+
     Box(
         modifier = modifier
             .padding(bottom = 20.dp)
@@ -212,7 +215,7 @@ fun ThirdScreen(
 
             Row(
                 modifier = Modifier
-                    .padding(top = 68.dp)
+                    .padding(top = 32.dp)
             ) {
                 ButtonSmall(
                     navigateButton = navigateBack,
@@ -223,7 +226,8 @@ fun ThirdScreen(
                         .padding(start = 8.dp)
                         .fillMaxWidth(),
                     navigateButton = navigateNext,
-                    title = "Next"
+                    title = "NEXT",
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -231,27 +235,27 @@ fun ThirdScreen(
 }
 
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun MainScreenPreview(){
     MainScreen()
 }
 
-@Preview(showBackground = true , device = Devices.PIXEL_4)
+@Preview(showBackground = true , device = Devices.PIXEL_3)
 @Composable
 fun FirstScreenPreview(){
     FirstScreen(navigateButton = {})
 }
 
 
-@Preview(showBackground = true , device = Devices.PIXEL_4)
+@Preview(showBackground = true , device = Devices.PIXEL_3)
 @Composable
 fun SecondScreenPreview(){
     SecondScreen(navigateNext = {}, navigateBack = {})
 }
 
 
-@Preview(showBackground = true , device = Devices.PIXEL_4)
+@Preview(showBackground = true , device = Devices.PIXEL_3)
 @Composable
 fun ThirdScreenPreview(){
     ThirdScreen(navigateNext = {}, navigateBack = {})
