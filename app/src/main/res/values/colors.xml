@@ -10,4 +10,7 @@
 
     <!-- App Custom Color   -->
     <color name="green_primary">#28B446</color>
+
+    <!-- Color Sampah   -->
+    <color name="plastic_color_bg">#FFF0F0</color>
 </resources>
