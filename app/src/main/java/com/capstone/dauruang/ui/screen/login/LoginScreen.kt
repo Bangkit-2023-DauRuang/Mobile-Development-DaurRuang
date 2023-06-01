@@ -3,14 +3,10 @@ package com.capstone.dauruang.ui.screen.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +38,12 @@ import com.capstone.dauruang.ui.components.textfield.EmailTextField
 import com.capstone.dauruang.ui.components.textfield.PasswordTextField
 
 @Composable
-fun LoginScreen(
+fun LoginScreen(){
+
+}
+
+@Composable
+fun LoginContent(
     modifier: Modifier = Modifier
         .fillMaxSize()
         .background(Color.White),
@@ -95,7 +96,7 @@ fun LoginScreen(
                     .padding(vertical = 4.dp)
             )
             Text(
-                text = "Adalah tempat terbaik untuk mu memilah sampah dan menjadikan uang",
+                text = "Dauruang adalah tempat terbaik untuk mu memilah sampah dan menjadikan uang",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 color = colorResource(R.color.green_primary)
@@ -187,6 +188,7 @@ fun LoginScreen(
             ButtonLargeIconSecondary(
                 onClickButton = {},
                 title = "Google",
+                type = "Login",
                 icons = painterResource(R.drawable.google)
             )
             Spacer(
@@ -200,7 +202,7 @@ fun LoginScreen(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(
+    LoginContent(
         email = "davidkrb52@gmail.com",
         password = "12345",
         onEmailChange = {},

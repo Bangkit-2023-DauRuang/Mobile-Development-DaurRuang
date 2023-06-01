@@ -42,12 +42,13 @@ fun ButtonLargeIconSecondary(
 
     onClickButton: () -> Unit,
     title: String,
+    type: String,
     icons: Painter,
     ) {
 
     val textTitle = buildAnnotatedString {
         withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
-            append("Login with ")
+            append("${type} with ")
         }
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
             append(title)
@@ -85,6 +86,7 @@ fun ButtonLargeIconSecondary(
 fun ButtonLargeIconSecondaryPreview() {
     ButtonLargeIconSecondary(
         onClickButton = {},
+        type = "Login",
         title = "Google",
         icons = painterResource(R.drawable.google)
     )
