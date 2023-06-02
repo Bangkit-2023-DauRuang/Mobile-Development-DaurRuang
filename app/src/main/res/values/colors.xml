@@ -13,4 +13,7 @@
 
     <!-- Color Sampah   -->
     <color name="plastic_color_bg">#FFF0F0</color>
+
+    <!--  Tabs Home Screen  -->
+    <color name="green_transparant">#F4F4F4</color>
 </resources>
