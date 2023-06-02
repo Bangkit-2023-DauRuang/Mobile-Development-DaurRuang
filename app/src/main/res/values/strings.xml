@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">DauRuang</string>
+
+    <!-- Splash Screen  -->
+    <string name="dauruang_logo">Logo DuaRuang</string>
+    <string name="hand_image">Image Hand Trash</string>
+    <string name="splash_image">Image Splash</string>
 </resources>
