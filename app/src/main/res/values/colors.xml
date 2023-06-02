@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- App Custom Color   -->
+    <color name="green_primary">#28B446</color>
+
+    <!-- Color Sampah   -->
+    <color name="plastic_color_bg">#FFF0F0</color>
 </resources>
