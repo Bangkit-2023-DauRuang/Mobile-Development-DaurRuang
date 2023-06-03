@@ -5,10 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.capstone.dauruang.ui.screen.home.HomeScreen
 import com.capstone.dauruang.ui.screen.register.RegisterContent
 
 @Composable
 fun DuaruangApp() {
+    HomeScreen()
+
+
 
 //     WelcomeScreen(navigateLogin = {}, navigateRegister = {})
 //     MainScreen()
