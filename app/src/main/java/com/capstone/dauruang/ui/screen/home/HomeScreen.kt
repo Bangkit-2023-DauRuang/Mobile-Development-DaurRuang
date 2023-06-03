@@ -1,5 +1,6 @@
 package com.capstone.dauruang.ui.screen.home
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,25 +15,38 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -45,23 +59,43 @@ import androidx.compose.ui.unit.sp
 import com.capstone.dauruang.R
 import com.capstone.dauruang.data.DataDauruang
 import com.capstone.dauruang.ui.components.content.TypeTrashCard
+import com.capstone.dauruang.ui.nav.BottomNavMainType
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier
         .background(Color.White)
 
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        HeaderContent()
 
-        // TabLayout Sampah ad Map
+    val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
 
-    }
+    Scaffold(
+        bottomBar = {
+            BottomBar(
+                homScreenState = homeScreenState
+            )
+        },
+        content = { paddingValue->
+            Column(
+                modifier = modifier
+                    .padding(paddingValue)
+                    .fillMaxSize()
+            ) {
+                HeaderContent()
 
+                // TabLayout Sampah ad Map
+
+                // Bottom NavBar
+                Column(
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -311,12 +345,103 @@ fun CustomMenuTabs(
 
 @Composable
 fun MapsView() {
+    Column() {
+        Text(
+            text = "Recycler Center",
+            color = colorResource(R.color.text_primary)
+        )
+        Box(modifier = Modifier){
 
+        }
+    }
 }
 
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    modifier: Modifier = Modifier
+        .background(Color.White),
+    homScreenState: MutableState<BottomNavMainType>,
+) {
+    var animate by remember { mutableStateOf(false) }
+    val selectedIndex = remember { mutableStateOf(0) }
 
+    NavigationBar(
+        modifier = modifier,
+        containerColor = Color.White
+    ) {
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Home",
+                    tint = colorResource(R.color.green_primary),
+                    modifier = Modifier
+                        .size(32.dp)
+                )
+            },
+            selected = homScreenState.value == BottomNavMainType.HOME,
+            onClick = {
+                homScreenState.value = BottomNavMainType.HOME
+                animate = false
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.Green,
+                unselectedIconColor = Color.Gray,
+                selectedTextColor = Color.Transparent,
+                indicatorColor = Color.White
+            )
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.icon_scan),
+                    contentDescription = "Scan",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(36.dp)
+                )
+            },
+            selected = homScreenState.value == BottomNavMainType.SCAN,
+            onClick = {
+                homScreenState.value = BottomNavMainType.SCAN
+                animate = false
+            },
+            modifier = Modifier
+                .padding(12.dp)
+                .background(
+                    color = colorResource(R.color.green_primary),
+                    shape = RoundedCornerShape(50.dp)
+                ),
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = colorResource(R.color.green_primary),
+                unselectedIconColor = Color.Gray,
+                selectedTextColor = Color.Transparent,
+                indicatorColor = colorResource(R.color.green_primary)
+            )
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.icon_transaction),
+                    contentDescription = "Scan",
+                    tint = colorResource(R.color.green_primary),
+                    modifier = Modifier
+                        .size(32.dp)
+                )
+            },
+            selected = homScreenState.value == BottomNavMainType.TRANSACTION,
+            onClick = {
+                homScreenState.value = BottomNavMainType.TRANSACTION
+                animate = false
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.Green,
+                unselectedIconColor = Color.Gray,
+                selectedTextColor = Color.Transparent,
+                indicatorColor = Color.White
+            )
+        )
+    }
 }
 
 
@@ -326,12 +451,27 @@ fun HomeScreenPreview() {
     HomeScreen()
 }
 
+@Preview(showBackground = true, device = Devices.PIXEL_3)
+@Composable
+fun MapViewPreview() {
+    MapsView()
+}
+
 @Preview(showBackground = true)
 @Composable
 fun TabLayoutTrashPreview() {
-    CustomMenuTabs(
-        text = "Botol",
-        selected = false
-    )
-    TabLayoutTrash()
+
+    val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
+
+    Column() {
+        CustomMenuTabs(
+            text = "Botol",
+            selected = false
+        )
+        TabLayoutTrash()
+        BottomBar(
+            homScreenState = homeScreenState
+        )
+    }
+
 }
