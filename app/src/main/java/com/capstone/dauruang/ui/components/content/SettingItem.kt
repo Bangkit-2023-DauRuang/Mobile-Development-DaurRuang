@@ -40,7 +40,7 @@ fun SettingItem(
     Column(
         modifier = modifier
             .padding(top = 12.dp)
-            .clickable{navigateToMenu},
+            .clickable{navigateToMenu()},
     ){
         Row(
             modifier = Modifier
