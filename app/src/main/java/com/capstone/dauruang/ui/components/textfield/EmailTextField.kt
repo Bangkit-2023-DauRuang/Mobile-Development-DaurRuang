@@ -1,8 +1,10 @@
 package com.capstone.dauruang.ui.components.textfield
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -42,7 +44,8 @@ fun EmailTextField(
     textColor: Color,
     email: String,
     onEmailChange: (String) -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    isError: Boolean = false
 ) {
     var text by remember { mutableStateOf(email) }
 
@@ -78,31 +81,44 @@ fun EmailTextField(
         }
     }
 
-    TextField(
-        value = email,
-        onValueChange = onEmailChange,
-        label = {
-            Text(
-                text ="Email",
-                color = colorResource(R.color.green_primary),
-                fontSize = if(text.isNotBlank()) 12.sp else 16.sp,
-            )
-        },
+    Column(
         modifier = Modifier
             .background(Color.White)
-            .fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Email
-        ),
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        ),
-        colors = customTextFieldColors,
-        trailingIcon = if (email.isNotBlank()) trailingIconView else null,
-        leadingIcon = leadingIconView
-    )
+    ){
+        TextField(
+            value = email,
+            onValueChange = onEmailChange,
+            label = {
+                Text(
+                    text ="Email",
+                    color = colorResource(R.color.green_primary),
+                    fontSize = if(text.isNotBlank()) 12.sp else 16.sp,
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email
+            ),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+            ),
+            colors = customTextFieldColors,
+            trailingIcon = if (email.isNotBlank()) trailingIconView else null,
+            leadingIcon = leadingIconView
+        )
+
+        if(isError){
+            Text(
+                text = "Email tidak boleh kosong",
+                color = Color.Red,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(start = 52.dp, top = 2.dp)
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)

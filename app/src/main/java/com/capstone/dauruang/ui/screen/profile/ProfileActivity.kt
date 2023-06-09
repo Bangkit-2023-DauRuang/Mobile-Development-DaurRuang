@@ -3,6 +3,7 @@ package com.capstone.dauruang.ui.screen.profile
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,17 +37,37 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.capstone.dauruang.R
 import com.capstone.dauruang.data.dummy.HistoryDataProvider
 import com.capstone.dauruang.ui.components.content.SettingItem
 import com.capstone.dauruang.ui.components.content.TitlePage
 import com.capstone.dauruang.ui.screen.history.HistoryActivity
 import com.capstone.dauruang.ui.screen.history.HistoryContent
+import com.capstone.dauruang.ui.screen.welcome.WelcomeActivity
 import com.capstone.dauruang.ui.theme.DauRuangTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class ProfileActivity: ComponentActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firebaseUser: FirebaseUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+
+        fun logOut(){
+            auth.signOut()
+            Intent(this, WelcomeActivity::class.java).also {
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(it)
+                Toast.makeText(this, "Logout Berhasil", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         setContent {
             DauRuangTheme {
@@ -56,11 +79,15 @@ class ProfileActivity: ComponentActivity() {
                         navigateBack = { onBackPressed() },
                         nameProfile = "David Nasrulloh",
                         imageProfile = painterResource(R.drawable.david),
-                        point = 23
+                        point = 23,
+                        logOut = {
+                            logOut()
+                        }
                     )
                 }
             }
         }
+
     }
 
     companion object {
@@ -77,7 +104,8 @@ fun ProfileContent(
     nameProfile: String,
     point: Int = 0,
     navigateBack: () -> Unit,
-    color: Color = colorResource(R.color.text_primary)
+    color: Color = colorResource(R.color.text_primary),
+    logOut: () -> Unit
 ){
     Column(
         modifier = modifier
@@ -162,6 +190,11 @@ fun ProfileContent(
                 title = "Info app",
                 navigateToMenu = {}
             )
+            SettingItem(
+                icons = Icons.Filled.Logout,
+                title = "Logout App",
+                navigateToMenu = logOut
+            )
         }
     }
 
@@ -171,9 +204,9 @@ fun ProfileContent(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun ProfileScreenPreview(){
-    ProfileContent(
-        navigateBack = {},
-        imageProfile = painterResource(R.drawable.david),
-        nameProfile = "David Nasrulloh"
-    )
+//    ProfileContent(
+//        navigateBack = {},
+//        imageProfile = painterResource(R.drawable.david),
+//        nameProfile = "David Nasrulloh"
+//    )
 }

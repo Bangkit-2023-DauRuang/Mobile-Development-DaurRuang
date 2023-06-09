@@ -1,7 +1,9 @@
 package com.capstone.dauruang.ui.components.textfield
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capstone.dauruang.R
 
@@ -43,7 +46,8 @@ fun PasswordTextField(
 
     textColor: Color,
     password: String,
-    onPassChange: (String) -> Unit
+    onPassChange: (String) -> Unit,
+    isError: Boolean = false
 ) {
     var pass by remember { mutableStateOf(password) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -66,44 +70,57 @@ fun PasswordTextField(
         }
     }
 
-    TextField(
-        value = password,
-        onValueChange = onPassChange,
-        singleLine = true,
-        label = {
-            Text(
-                text = "Password",
-                color = colorResource(R.color.green_primary),
-                fontSize = if (pass.isNotBlank()) 12.sp else 16.sp,
-            )
-        },
+    Column(
         modifier = Modifier
             .background(Color.White)
-            .fillMaxWidth(),
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        ),
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        trailingIcon = {
-            val image = if (passwordVisible)
-                Icons.Filled.Visibility
-            else Icons.Filled.VisibilityOff
-
-            val description = if (passwordVisible) "Hide password" else "Show password"
-
-            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                Icon(
-                    imageVector = image, description,
-                    tint = colorResource(R.color.green_primary)
+    ){
+        TextField(
+            value = password,
+            onValueChange = onPassChange,
+            singleLine = true,
+            label = {
+                Text(
+                    text = "Password",
+                    color = colorResource(R.color.green_primary),
+                    fontSize = if (pass.isNotBlank()) 12.sp else 16.sp,
                 )
-            }
-        },
-        leadingIcon = leadingIconView,
-        colors = customTextFieldColors,
-    )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+            ),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else Icons.Filled.VisibilityOff
+
+                val description = if (passwordVisible) "Hide password" else "Show password"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = image, description,
+                        tint = colorResource(R.color.green_primary)
+                    )
+                }
+            },
+            leadingIcon = leadingIconView,
+            colors = customTextFieldColors,
+        )
+
+        if(isError){
+            Text(
+                text = "Email tidak boleh kosong",
+                color = Color.Red,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(start = 52.dp, top = 2.dp)
+            )
+        }
+    }
 
 }
 
