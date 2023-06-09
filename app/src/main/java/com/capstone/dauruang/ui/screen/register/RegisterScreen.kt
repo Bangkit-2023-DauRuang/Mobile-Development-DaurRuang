@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -50,15 +52,22 @@ fun RegisterScreen(
         .background(Color.White),
 
     username: String? = null,
+    fullname: String? = null,
     email: String,
     password: String,
     noHp: String? = null,
     onUsernameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onNoHpChange: (String) -> Unit,
+
+    isErrorDisplayed: Boolean,
     onRegisterClick: () -> Unit,
+    onRegisterGoogle: () -> Unit,
+
     onClearUsername: () -> Unit,
+    onClearFullname: () -> Unit,
     onClearHp: () -> Unit,
     onClearEmail: () -> Unit,
 
@@ -118,7 +127,22 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Text,
                 text = username!!,
                 onTextChange = onUsernameChange,
-                onClear = onClearUsername
+                onClear = onClearUsername,
+                isError = isErrorDisplayed && username.isEmpty()
+            )
+            Spacer(
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+            )
+            CustomTextField(
+                title = "Full Name",
+                textColor = colorResource(R.color.green_primary),
+                iconLeading = Icons.Filled.AccountCircle,
+                keyboardType = KeyboardType.Text,
+                text = fullname!!,
+                onTextChange = onFullNameChange,
+                onClear = onClearFullname,
+                isError = isErrorDisplayed && fullname.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -128,7 +152,8 @@ fun RegisterScreen(
                 textColor = colorResource(R.color.green_primary),
                 email = email,
                 onEmailChange = onEmailChange,
-                onClear = onClearEmail
+                onClear = onClearEmail,
+                isError = isErrorDisplayed && email.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -137,7 +162,8 @@ fun RegisterScreen(
             PasswordTextField(
                 textColor = colorResource(R.color.green_primary),
                 password = password,
-                onPassChange = onPassChange
+                onPassChange = onPassChange,
+                isError = isErrorDisplayed && password.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -150,7 +176,8 @@ fun RegisterScreen(
                 keyboardType = KeyboardType.Phone,
                 text = noHp!!,
                 onTextChange = onNoHpChange,
-                onClear = onClearHp
+                onClear = onClearHp,
+                isError = isErrorDisplayed && noHp.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -218,7 +245,7 @@ fun RegisterScreen(
                     .padding(vertical = 4.dp)
             )
             ButtonLargeIconSecondary(
-                onClickButton = {},
+                onClickButton = onRegisterGoogle,
                 type = "Register",
                 title = "Google",
                 icons = painterResource(R.drawable.google)

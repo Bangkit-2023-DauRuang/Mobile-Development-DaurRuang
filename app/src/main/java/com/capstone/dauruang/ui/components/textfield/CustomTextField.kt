@@ -1,7 +1,9 @@
 package com.capstone.dauruang.ui.components.textfield
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -26,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capstone.dauruang.R
 
@@ -43,7 +46,8 @@ fun CustomTextField(
     keyboardType: KeyboardType,
     text: String,
     onTextChange: (String) -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    isError: Boolean = false
 ) {
 
     var textValue by remember { mutableStateOf(text) }
@@ -78,32 +82,44 @@ fun CustomTextField(
         }
     }
 
-
-    TextField(
-        value = text ,
-        onValueChange = onTextChange,
-        label = {
-            Text(
-                text = title,
-                color = colorResource(R.color.green_primary),
-                fontSize = if(textValue.isNotBlank()) 12.sp else 16.sp,
-            )
-        },
+    Column(
         modifier = Modifier
             .background(Color.White)
-            .fillMaxWidth(),
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor,
-        ),
-        colors = customTextFieldColors,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType
-        ),
-        trailingIcon = if (text.isNotBlank()) trailingIconView else null,
-        leadingIcon = leadingIconView
-    )
+    ){
+        TextField(
+            value = text ,
+            onValueChange = onTextChange,
+            label = {
+                Text(
+                    text = title,
+                    color = colorResource(R.color.green_primary),
+                    fontSize = if(textValue.isNotBlank()) 12.sp else 16.sp,
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+            ),
+            colors = customTextFieldColors,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType
+            ),
+            trailingIcon = if (text.isNotBlank()) trailingIconView else null,
+            leadingIcon = leadingIconView
+        )
+
+        if(isError){
+            Text(
+                text = "${title} tidak boleh kosong",
+                color = Color.Red,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(start = 52.dp, top = 2.dp)
+            )
+        }
+    }
 
 }
 
@@ -118,6 +134,7 @@ fun CustomTextFieldPreview() {
         keyboardType = KeyboardType.Phone,
         text = "davidnasrulloh",
         onTextChange = {},
-        onClear = {}
+        onClear = {},
+        isError = true
     )
 }

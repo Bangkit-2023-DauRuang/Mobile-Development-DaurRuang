@@ -49,8 +49,13 @@ fun LoginScreen(
     password: String,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
+
     onLoginClick: () -> Unit,
+    onLoginGoogle: () -> Unit,
+
     onClear: () -> Unit,
+    isErrorDisplayed: Boolean,
+
     // navigasi
     navigateToRegister: () -> Unit
 ) {
@@ -105,7 +110,8 @@ fun LoginScreen(
                 textColor = colorResource(R.color.green_primary),
                 email = email,
                 onEmailChange = onEmailChange,
-                onClear = onClear
+                onClear = onClear,
+                isError = isErrorDisplayed && email.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -114,7 +120,8 @@ fun LoginScreen(
             PasswordTextField(
                 textColor = colorResource(R.color.green_primary),
                 password = password,
-                onPassChange = onPassChange
+                onPassChange = onPassChange,
+                isError = isErrorDisplayed && password.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -182,7 +189,7 @@ fun LoginScreen(
                     .padding(vertical = 4.dp)
             )
             ButtonLargeIconSecondary(
-                onClickButton = {},
+                onClickButton = onLoginGoogle,
                 title = "Google",
                 type = "Login",
                 icons = painterResource(R.drawable.google)
