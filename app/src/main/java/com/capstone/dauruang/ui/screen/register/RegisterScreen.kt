@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.button.ButtonLargeIconSecondary
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
@@ -44,13 +45,6 @@ import com.capstone.dauruang.ui.components.textfield.PasswordTextField
 
 @Composable
 fun RegisterScreen(
-
-) {
-
-}
-
-@Composable
-fun RegisterContent(
     modifier: Modifier = Modifier
         .fillMaxSize()
         .background(Color.White),
@@ -185,7 +179,7 @@ fun RegisterContent(
                     color = colorResource(R.color.green_primary),
                     modifier = Modifier
                         .padding(start = 4.dp)
-                        .clickable { navigateToLogin },
+                        .clickable { navigateToLogin() }
                 )
             }
             Spacer(
@@ -241,19 +235,19 @@ fun RegisterContent(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun RegisterScreenPreview(){
-    RegisterContent(
-        username = "david",
-        email = "davidkrb52@gmail.com",
-        password = "12345",
-        noHp = "081554465073",
-        onUsernameChange = {},
-        onEmailChange = {},
-        onPassChange = {},
-        onNoHpChange = {},
-        onRegisterClick = {},
-        onClearEmail = {},
-        onClearUsername = {},
-        onClearHp = {},
-        navigateToLogin = {}
-    )
+//    RegisterScreen(
+//        username = "david",
+//        email = "davidkrb52@gmail.com",
+//        password = "12345",
+//        noHp = "081554465073",
+//        onUsernameChange = {},
+//        onEmailChange = {},
+//        onPassChange = {},
+//        onNoHpChange = {},
+//        onRegisterClick = {},
+//        onClearEmail = {},
+//        onClearUsername = {},
+//        onClearHp = {},
+//        navigateToLogin = {}
+//    )
 }

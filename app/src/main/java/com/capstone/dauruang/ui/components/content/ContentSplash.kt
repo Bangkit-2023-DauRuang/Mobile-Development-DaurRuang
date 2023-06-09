@@ -36,7 +36,7 @@ fun ContentSplash(
         Text(
             text = title,
             fontWeight = FontWeight.Bold,
-            fontSize = 36.sp,
+            fontSize = 32.sp,
             color = colorResource(R.color.green_primary),
             modifier = Modifier
                 .padding(bottom = 12.dp, start = 12.dp, end = 12.dp),
@@ -48,7 +48,7 @@ fun ContentSplash(
         Text(
             text = content,
             fontWeight = FontWeight.Normal,
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             color = colorResource(R.color.green_primary),
             textAlign = TextAlign.Center,
             modifier = Modifier

@@ -1,6 +1,8 @@
-package com.capstone.dauruang
+package com.capstone.dauruang.ui.screen.splash
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.capstone.dauruang.ui.screen.splash.OnBoardingScreen
+import androidx.core.content.ContextCompat.startActivity
+import com.capstone.dauruang.ui.screen.history.HistoryActivity
 import com.capstone.dauruang.ui.theme.DauRuangTheme
 
-class MainActivity : ComponentActivity() {
+
+class OnBoardingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context: Context = this
@@ -22,12 +26,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-
-//                    DuaruangApp(context)
                     OnBoardingScreen()
                 }
             }
         }
     }
+
+    companion object {
+        fun newIntent(context: Context) {
+            val intent = Intent(context, OnBoardingActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+            (context as? Activity)?.finish()
+        }
+    }
+
 }
+

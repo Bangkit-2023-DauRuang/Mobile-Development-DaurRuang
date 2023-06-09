@@ -1,7 +1,7 @@
 package com.capstone.dauruang.data
 
 import com.capstone.dauruang.R
-import com.capstone.dauruang.model.ItemTrash
+import com.capstone.dauruang.model.Trash
 import com.capstone.dauruang.model.TabMenu
 
 object DataDauruang {
@@ -26,21 +26,21 @@ object DataDauruang {
     )
 
     val botolMenu = listOf(
-        ItemTrash(
+        Trash(
             id = 1,
             title = "Image botol 1",
             description = "null",
             imageId =  R.drawable.botol_1,
             source = "app source"
         ),
-        ItemTrash(
+        Trash(
             id = 2,
             title = "Image botol 2",
             description = "null",
             imageId =  R.drawable.botol_2,
             source = "app source"
         ),
-        ItemTrash(
+        Trash(
             id = 3,
             title = "Image botol 3",
             description = "null",
@@ -50,21 +50,21 @@ object DataDauruang {
     )
 
     val plasticMenu = listOf(
-        ItemTrash(
+        Trash(
             id = 1,
             title = "Image plastic 1",
             description = "null",
             imageId =  R.drawable.plastic_1,
             source = "app source"
         ),
-        ItemTrash(
+        Trash(
             id = 2,
             title = "Image botol 2",
             description = "null",
             imageId =  R.drawable.plastic_2,
             source = "app source"
         ),
-        ItemTrash(
+        Trash(
             id = 3,
             title = "Image botol 3",
             description = "null",
@@ -74,7 +74,7 @@ object DataDauruang {
     )
 
     val kacaMenu = listOf(
-        ItemTrash(
+        Trash(
             id = 1,
             title = "Image kaca 1",
             description = "null",
@@ -84,14 +84,14 @@ object DataDauruang {
     )
 
     val kertasMenu = listOf(
-        ItemTrash(
+        Trash(
             id = 1,
             title = "Image kertas 1",
             description = "null",
             imageId =  R.drawable.kertas_1,
             source = "app source"
         ),
-        ItemTrash(
+        Trash(
             id = 1,
             title = "Image kertas 2",
             description = "null",
