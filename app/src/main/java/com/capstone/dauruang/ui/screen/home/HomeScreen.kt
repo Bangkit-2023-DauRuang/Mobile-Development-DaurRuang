@@ -1,8 +1,12 @@
 package com.capstone.dauruang.ui.screen.home
 
-import androidx.compose.animation.Crossfade
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,7 +29,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -45,10 +47,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,34 +60,45 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import com.capstone.dauruang.R
 import com.capstone.dauruang.data.DataDauruang
 import com.capstone.dauruang.ui.components.content.TypeTrashCard
 import com.capstone.dauruang.ui.nav.BottomNavMainType
+import com.capstone.dauruang.ui.screen.history.HistoryActivity
+import com.capstone.dauruang.ui.screen.profile.ProfileActivity
+import com.capstone.dauruang.ui.screen.scan.ScanActivity
+import com.capstone.dauruang.ui.screen.transaction.TransactionActivity
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    context: Context,
     modifier: Modifier = Modifier
         .background(Color.White)
-
 ) {
-
     val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
 
     Scaffold(
         bottomBar = {
             BottomBar(
-                homScreenState = homeScreenState
+                homScreenState = homeScreenState,
+                context = context
             )
         },
-        content = { paddingValue->
+        content = { paddingValue ->
             Column(
                 modifier = modifier
                     .padding(paddingValue)
                     .fillMaxSize()
             ) {
-                HeaderContent()
+                HeaderContent(context = context)
 
                 // TabLayout Sampah ad Map
 
@@ -91,7 +106,7 @@ fun HomeScreen(
                 Column(
                     verticalArrangement = Arrangement.Bottom
                 ) {
-
+                    MapsView()
                 }
             }
         }
@@ -100,6 +115,7 @@ fun HomeScreen(
 
 @Composable
 fun HeaderContent(
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -176,14 +192,15 @@ fun HeaderContent(
                                 contentDescription = "profile_photo",
                                 modifier = Modifier
                                     .padding(bottom = 8.dp)
-                                    .clickable {}
+                                    .clickable { context.startActivity(ProfileActivity.newIntent(context)) }
                             )
                             Icon(
                                 imageVector = Icons.Outlined.History,
                                 contentDescription = "history_icon",
                                 modifier = modifier
-                                    .size(28.dp),
-                                tint = colorResource(R.color.green_primary)
+                                    .size(28.dp)
+                                    .clickable { context.startActivity(HistoryActivity.newIntent(context)) },
+                                tint = colorResource(R.color.green_primary),
                             )
 
                         }
@@ -310,7 +327,6 @@ fun TabLayoutTrash() {
         }
 
     }
-
 }
 
 @Composable
@@ -344,22 +360,163 @@ fun CustomMenuTabs(
 }
 
 @Composable
+fun CustomMenuButtonMaps(
+    text: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier
+        .padding(end = 12.dp)
+){
+
+    Surface(
+        color = when {
+            selected -> colorResource(R.color.green_primary).copy(alpha = 0.7f)
+            else -> colorResource(R.color.green_transparant)
+        },
+        contentColor = when {
+            selected -> Color.White
+            else -> colorResource(R.color.green_primary)
+        },
+        shape = RoundedCornerShape(100.dp),
+        modifier = modifier
+            .width(93.dp)
+            .height(37.dp)
+            .graphicsLayer(alpha = 0.8f)
+            .border(
+                2.dp,
+                colorResource(R.color.green_primary),
+                shape = RoundedCornerShape(100.dp)
+            )
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = text, fontWeight = FontWeight.Medium)
+        }
+    }
+
+}
+
+@Composable
 fun MapsView() {
-    Column() {
+
+    val context = LocalContext.current
+    val mapView = rememberMapView()
+
+    var latitude by remember { mutableStateOf(49.110) }
+    var longitude by remember { mutableStateOf(-122.554) }
+
+    val tabMenu = remember { DataDauruang.tabMenu.filter { it.id > 0 } }
+    val selectedIndex = remember { mutableStateOf(0) }
+
+    val boxModifier = Modifier
+        .fillMaxWidth()
+
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+    ) {
         Text(
             text = "Recycler Center",
-            color = colorResource(R.color.text_primary)
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            color = colorResource(R.color.text_primary),
+            modifier = Modifier
+                .padding(top = 12.dp, bottom = 8.dp)
         )
-        Box(modifier = Modifier){
+        Box(
+            modifier = boxModifier
+                .background(color = Color.White, shape = RoundedCornerShape(8.dp))
+                .clip(shape = RoundedCornerShape(12.dp))
+                .border(
+                    3.dp,
+                    colorResource(R.color.green_primary).copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+        ) {
+            AndroidView(
+                factory = { mapView },
+                modifier = Modifier
+                        .fillMaxSize()
+            ) { view ->
+                val hasLocationPermission = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
 
+                MapsInitializer.initialize(context)
+                view.onCreate(null)
+                view.getMapAsync { googleMap ->
+                    googleMap.apply {
+
+                        // uiSettings.isZoomControlsEnabled = true
+
+                        val location = LatLng(latitude, longitude)
+                        addMarker(MarkerOptions().position(location).title("My Location"))
+                        moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12f))
+
+                        isMyLocationEnabled = hasLocationPermission
+                    }
+                }
+            }
+
+            // Tab Menu Maps
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ){
+                ScrollableTabRow(
+                    selectedTabIndex = selectedIndex.value,
+                    divider = {},
+                    edgePadding = 4.dp,
+                    indicator = noIndicator,
+                    containerColor = Color.Transparent,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                ) {
+                    tabMenu.forEachIndexed { index, tabMenu ->
+                        Tab(
+                            selected = index == selectedIndex.value,
+                            onClick = {
+                                selectedIndex.value = index
+                            },
+                        ) {
+                            CustomMenuButtonMaps(
+                                text = tabMenu.title,
+                                selected = index == selectedIndex.value,
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
+
+@Composable
+private fun rememberMapView(): MapView {
+    val context = LocalContext.current
+    val mapView = remember {
+        MapView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+    }
+    return mapView
+}
+
+
+// Bottom Bar
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier
         .background(Color.White),
+    context: Context,
     homScreenState: MutableState<BottomNavMainType>,
 ) {
     var animate by remember { mutableStateOf(false) }
@@ -403,6 +560,8 @@ fun BottomBar(
             },
             selected = homScreenState.value == BottomNavMainType.SCAN,
             onClick = {
+                context.startActivity(ScanActivity.newIntent(context))
+
                 homScreenState.value = BottomNavMainType.SCAN
                 animate = false
             },
@@ -426,11 +585,13 @@ fun BottomBar(
                     contentDescription = "Scan",
                     tint = colorResource(R.color.green_primary),
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(30.dp)
                 )
             },
             selected = homScreenState.value == BottomNavMainType.TRANSACTION,
             onClick = {
+                context.startActivity(TransactionActivity.newIntent(context))
+
                 homScreenState.value = BottomNavMainType.TRANSACTION
                 animate = false
             },
@@ -448,7 +609,8 @@ fun BottomBar(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+//    val context = LocalContext.current
+//    HomeScreen()
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
@@ -462,6 +624,7 @@ fun MapViewPreview() {
 fun TabLayoutTrashPreview() {
 
     val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
+    val context = LocalContext.current
 
     Column() {
         CustomMenuTabs(
@@ -469,8 +632,13 @@ fun TabLayoutTrashPreview() {
             selected = false
         )
         TabLayoutTrash()
+        CustomMenuButtonMaps(
+            text = "Botol",
+            selected = true
+        )
         BottomBar(
-            homScreenState = homeScreenState
+            homScreenState = homeScreenState,
+            context = context
         )
     }
 
