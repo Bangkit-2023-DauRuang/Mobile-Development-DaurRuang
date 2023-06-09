@@ -31,19 +31,16 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.button.ButtonLargeIconSecondary
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
 import com.capstone.dauruang.ui.components.textfield.EmailTextField
 import com.capstone.dauruang.ui.components.textfield.PasswordTextField
 
-@Composable
-fun LoginScreen(){
-
-}
 
 @Composable
-fun LoginContent(
+fun LoginScreen(
     modifier: Modifier = Modifier
         .fillMaxSize()
         .background(Color.White),
@@ -52,8 +49,12 @@ fun LoginContent(
     password: String,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
+
     onLoginClick: () -> Unit,
+    onLoginGoogle: () -> Unit,
+
     onClear: () -> Unit,
+    isErrorDisplayed: Boolean,
 
     // navigasi
     navigateToRegister: () -> Unit
@@ -109,7 +110,8 @@ fun LoginContent(
                 textColor = colorResource(R.color.green_primary),
                 email = email,
                 onEmailChange = onEmailChange,
-                onClear = onClear
+                onClear = onClear,
+                isError = isErrorDisplayed && email.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -118,7 +120,8 @@ fun LoginContent(
             PasswordTextField(
                 textColor = colorResource(R.color.green_primary),
                 password = password,
-                onPassChange = onPassChange
+                onPassChange = onPassChange,
+                isError = isErrorDisplayed && password.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -147,7 +150,7 @@ fun LoginContent(
                     color = colorResource(R.color.green_primary),
                     modifier = Modifier
                         .padding(start = 4.dp)
-                        .clickable { navigateToRegister },
+                        .clickable { navigateToRegister() },
                 )
             }
             Spacer(
@@ -186,7 +189,7 @@ fun LoginContent(
                     .padding(vertical = 4.dp)
             )
             ButtonLargeIconSecondary(
-                onClickButton = {},
+                onClickButton = onLoginGoogle,
                 title = "Google",
                 type = "Login",
                 icons = painterResource(R.drawable.google)
@@ -202,13 +205,14 @@ fun LoginContent(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun LoginScreenPreview() {
-    LoginContent(
-        email = "davidkrb52@gmail.com",
-        password = "12345",
-        onEmailChange = {},
-        onPassChange = {},
-        onLoginClick = {},
-        onClear = {},
-        navigateToRegister = {}
-    )
+//    LoginScreen(
+//        email = "davidkrb52@gmail.com",
+//        password = "12345",
+//        onEmailChange = {},
+//        onPassChange = {},
+//        onLoginClick = {},
+//        onClear = {},
+//        navigateToRegister = {},
+//        navController =
+//    )
 }

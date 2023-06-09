@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "531323566310",
+    "firebase_url": "https://dauruang-b983c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "dauruang-b983c",
+    "storage_bucket": "dauruang-b983c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531323566310:android:f5bb97d44c3e542ded6327",
+        "android_client_info": {
+          "package_name": "com.capstone.dauruang"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531323566310-g0gmojuq9nid2sctcsq22pmc00rjfenn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.dauruang",
+            "certificate_hash": "a0094874a4d06dcaa6b110a65765cdebc502fe9c"
+          }
+        },
+        {
+          "client_id": "531323566310-t1v6tg6n6svriuhg2uc8j8trir6c76pi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMcZPKN2qPzKVit2JH-1hpN1YW8L69VLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531323566310-0j4t7fvdomrhsb34erf4rsl010gkg8aa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

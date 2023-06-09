@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -35,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.button.ButtonLargeIconSecondary
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
@@ -44,27 +47,27 @@ import com.capstone.dauruang.ui.components.textfield.PasswordTextField
 
 @Composable
 fun RegisterScreen(
-
-) {
-
-}
-
-@Composable
-fun RegisterContent(
     modifier: Modifier = Modifier
         .fillMaxSize()
         .background(Color.White),
 
     username: String? = null,
+    fullname: String? = null,
     email: String,
     password: String,
     noHp: String? = null,
     onUsernameChange: (String) -> Unit,
+    onFullNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onNoHpChange: (String) -> Unit,
+
+    isErrorDisplayed: Boolean,
     onRegisterClick: () -> Unit,
+    onRegisterGoogle: () -> Unit,
+
     onClearUsername: () -> Unit,
+    onClearFullname: () -> Unit,
     onClearHp: () -> Unit,
     onClearEmail: () -> Unit,
 
@@ -124,7 +127,22 @@ fun RegisterContent(
                 keyboardType = KeyboardType.Text,
                 text = username!!,
                 onTextChange = onUsernameChange,
-                onClear = onClearUsername
+                onClear = onClearUsername,
+                isError = isErrorDisplayed && username.isEmpty()
+            )
+            Spacer(
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+            )
+            CustomTextField(
+                title = "Full Name",
+                textColor = colorResource(R.color.green_primary),
+                iconLeading = Icons.Filled.AccountCircle,
+                keyboardType = KeyboardType.Text,
+                text = fullname!!,
+                onTextChange = onFullNameChange,
+                onClear = onClearFullname,
+                isError = isErrorDisplayed && fullname.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -134,7 +152,8 @@ fun RegisterContent(
                 textColor = colorResource(R.color.green_primary),
                 email = email,
                 onEmailChange = onEmailChange,
-                onClear = onClearEmail
+                onClear = onClearEmail,
+                isError = isErrorDisplayed && email.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -143,7 +162,8 @@ fun RegisterContent(
             PasswordTextField(
                 textColor = colorResource(R.color.green_primary),
                 password = password,
-                onPassChange = onPassChange
+                onPassChange = onPassChange,
+                isError = isErrorDisplayed && password.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -156,7 +176,8 @@ fun RegisterContent(
                 keyboardType = KeyboardType.Phone,
                 text = noHp!!,
                 onTextChange = onNoHpChange,
-                onClear = onClearHp
+                onClear = onClearHp,
+                isError = isErrorDisplayed && noHp.isEmpty()
             )
             Spacer(
                 modifier = Modifier
@@ -185,7 +206,7 @@ fun RegisterContent(
                     color = colorResource(R.color.green_primary),
                     modifier = Modifier
                         .padding(start = 4.dp)
-                        .clickable { navigateToLogin },
+                        .clickable { navigateToLogin() }
                 )
             }
             Spacer(
@@ -224,7 +245,7 @@ fun RegisterContent(
                     .padding(vertical = 4.dp)
             )
             ButtonLargeIconSecondary(
-                onClickButton = {},
+                onClickButton = onRegisterGoogle,
                 type = "Register",
                 title = "Google",
                 icons = painterResource(R.drawable.google)
@@ -241,19 +262,19 @@ fun RegisterContent(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun RegisterScreenPreview(){
-    RegisterContent(
-        username = "david",
-        email = "davidkrb52@gmail.com",
-        password = "12345",
-        noHp = "081554465073",
-        onUsernameChange = {},
-        onEmailChange = {},
-        onPassChange = {},
-        onNoHpChange = {},
-        onRegisterClick = {},
-        onClearEmail = {},
-        onClearUsername = {},
-        onClearHp = {},
-        navigateToLogin = {}
-    )
+//    RegisterScreen(
+//        username = "david",
+//        email = "davidkrb52@gmail.com",
+//        password = "12345",
+//        noHp = "081554465073",
+//        onUsernameChange = {},
+//        onEmailChange = {},
+//        onPassChange = {},
+//        onNoHpChange = {},
+//        onRegisterClick = {},
+//        onClearEmail = {},
+//        onClearUsername = {},
+//        onClearHp = {},
+//        navigateToLogin = {}
+//    )
 }

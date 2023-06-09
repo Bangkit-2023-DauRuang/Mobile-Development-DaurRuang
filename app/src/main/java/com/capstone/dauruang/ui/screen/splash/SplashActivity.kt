@@ -1,5 +1,10 @@
 package com.capstone.dauruang.ui.screen.splash
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,14 +33,49 @@ import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
 import com.capstone.dauruang.ui.components.button.ButtonSmall
 import com.capstone.dauruang.ui.components.content.ContentSplash
+import com.capstone.dauruang.ui.theme.DauRuangTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@Composable
-fun SplashScreen () {
+class SplashActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val context: Context = this
 
+        setContent {
+            DauRuangTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SplashScreen()
+                }
+            }
+        }
+
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(2000L)
+            startNextActivity()
+        }
+    }
+
+    private fun startNextActivity() {
+        val intent = Intent(this, OnBoardingActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
+    }
 }
 
 @Composable
-fun MainScreen(
+fun SplashScreen () {
+    SplashContent()
+}
+
+@Composable
+fun SplashContent(
     modifier: Modifier = Modifier
 ){
     Box(
@@ -62,6 +104,11 @@ fun MainScreen(
             contentDescription = stringResource(R.string.hand_image))
     }
 }
+
+
+
+
+// Kode ini tidak digunakan untuk belajar saja
 
 @Composable
 fun FirstScreen(
@@ -238,7 +285,7 @@ fun ThirdScreen(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun MainScreenPreview(){
-    MainScreen()
+    SplashContent()
 }
 
 @Preview(showBackground = true , device = Devices.PIXEL_3)

@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +25,7 @@
         android:theme="@style/Theme.DauRuang"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.screen.splash.SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.DauRuang">
@@ -23,6 +35,44 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.screen.scan.ScanActivity"
+            android:label="scan_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".ui.screen.history.HistoryActivity"
+            android:label="scan_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".ui.screen.profile.ProfileActivity"
+            android:label="scan_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".ui.screen.transaction.TransactionActivity"
+            android:label="scan_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".MainActivity"
+            android:label="main_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".ui.screen.splash.OnBoardingActivity"
+            android:label="onBoarding_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <activity
+            android:name=".ui.screen.welcome.WelcomeActivity"
+            android:label="welcome_activity"
+            android:theme="@style/Theme.DauRuang" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>

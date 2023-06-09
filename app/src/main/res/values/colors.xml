@@ -10,7 +10,14 @@
 
     <!-- App Custom Color   -->
     <color name="green_primary">#28B446</color>
+    <color name="text_primary">#374039</color>
 
     <!-- Color Sampah   -->
     <color name="plastic_color_bg">#FFF0F0</color>
+
+    <!--  Tabs Home Screen  -->
+    <color name="green_transparant">#F4F4F4</color>
+
+    <!-- Modal -->
+    <color name="color_modal">#F6F6F6</color>
 </resources>

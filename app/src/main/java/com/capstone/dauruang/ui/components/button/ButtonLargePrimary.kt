@@ -37,7 +37,7 @@ fun ButtonLargePrimary (
     Button(
         onClick = navigateButton,
         modifier = modifier
-            .height(44.dp),
+            .height(46.dp),
         shape = RoundedCornerShape(16),
         colors = buttonColors
     ) {
