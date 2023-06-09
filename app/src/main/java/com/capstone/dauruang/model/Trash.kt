@@ -2,7 +2,7 @@ package com.capstone.dauruang.model
 
 import androidx.annotation.DrawableRes
 
-data class ItemTrash(
+data class Trash(
     val id: Int,
     val title: String,
     val description: String,

@@ -17,4 +17,7 @@
 
     <!--  Tabs Home Screen  -->
     <color name="green_transparant">#F4F4F4</color>
+
+    <!-- Modal -->
+    <color name="color_modal">#F6F6F6</color>
 </resources>
