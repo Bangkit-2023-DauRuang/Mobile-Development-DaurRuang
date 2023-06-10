@@ -3,6 +3,7 @@ package com.capstone.dauruang.ui.screen.home
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import coil.compose.rememberAsyncImagePainter
 import com.capstone.dauruang.R
 import com.capstone.dauruang.data.DataDauruang
 import com.capstone.dauruang.ui.components.content.TypeTrashCard
@@ -81,7 +83,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 fun HomeScreen(
     context: Context,
     modifier: Modifier = Modifier
-        .background(Color.White)
+        .background(Color.White),
+    name: String?,
+    photo: Uri?
 ) {
     val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
 
@@ -98,7 +102,7 @@ fun HomeScreen(
                     .padding(paddingValue)
                     .fillMaxSize()
             ) {
-                HeaderContent(context = context)
+                HeaderContent(context = context, name = name, photo = photo)
 
                 // TabLayout Sampah ad Map
 
@@ -116,7 +120,9 @@ fun HomeScreen(
 @Composable
 fun HeaderContent(
     context: Context,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    name: String?,
+    photo: Uri?
 ) {
     Box(
         modifier = Modifier
@@ -168,7 +174,7 @@ fun HeaderContent(
                                 .padding(end = 12.dp)
                         ) {
                             Text(
-                                text = "David Nasrulloh",
+                                text = name.toString(),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
                                 color = Color.Black
@@ -188,18 +194,33 @@ fun HeaderContent(
                                 .padding(horizontal = 4.dp)
                         ) {
                             Image(
-                                painter = painterResource(R.drawable.david),
+                                painter = if(photo != null) rememberAsyncImagePainter(photo) else painterResource(
+                                    R.drawable.image_default
+                                ),
                                 contentDescription = "profile_photo",
                                 modifier = Modifier
                                     .padding(bottom = 8.dp)
-                                    .clickable { context.startActivity(ProfileActivity.newIntent(context)) }
+                                    .clip(shape = RoundedCornerShape(100.dp))
+                                    .clickable {
+                                        context.startActivity(
+                                            ProfileActivity.newIntent(
+                                                context
+                                            )
+                                        )
+                                    }
                             )
                             Icon(
                                 imageVector = Icons.Outlined.History,
                                 contentDescription = "history_icon",
                                 modifier = modifier
                                     .size(28.dp)
-                                    .clickable { context.startActivity(HistoryActivity.newIntent(context)) },
+                                    .clickable {
+                                        context.startActivity(
+                                            HistoryActivity.newIntent(
+                                                context
+                                            )
+                                        )
+                                    },
                                 tint = colorResource(R.color.green_primary),
                             )
 
@@ -399,7 +420,6 @@ fun CustomMenuButtonMaps(
 
 @Composable
 fun MapsView() {
-
     val context = LocalContext.current
     val mapView = rememberMapView()
 
@@ -481,6 +501,8 @@ fun MapsView() {
                             selected = index == selectedIndex.value,
                             onClick = {
                                 selectedIndex.value = index
+                                latitude = tabMenu.latitude
+                                longitude = tabMenu.longtitude
                             },
                         ) {
                             CustomMenuButtonMaps(

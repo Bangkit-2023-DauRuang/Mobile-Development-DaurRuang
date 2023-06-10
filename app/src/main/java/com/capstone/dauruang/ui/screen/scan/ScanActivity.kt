@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
-import com.capstone.dauruang.DuaruangApp
 import com.capstone.dauruang.MainActivity
 import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.screen.home.HomeScreen

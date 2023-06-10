@@ -38,26 +38,42 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.dauruang.MainActivity
 import com.capstone.dauruang.R
+import com.capstone.dauruang.data.local.PreferenceAuthManager
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
 import com.capstone.dauruang.ui.components.button.ButtonLargeSecondary
 import com.capstone.dauruang.ui.components.content.ContentSplash
 import com.capstone.dauruang.ui.screen.login.LoginScreen
 import com.capstone.dauruang.ui.screen.register.RegisterScreen
 import com.capstone.dauruang.ui.theme.DauRuangTheme
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.BuildConfig
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.delay
 
 class WelcomeActivity : ComponentActivity() {
 
-    private lateinit var auth : FirebaseAuth
+    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     lateinit var ref: DatabaseReference
+
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    companion object {
+        private const val RC_SIGN_IN = 1001
+        fun newIntent(context: Context) = Intent(context, WelcomeActivity::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
         ref = FirebaseDatabase.getInstance().getReference("USERS")
 
         setContent {
@@ -85,37 +101,51 @@ class WelcomeActivity : ComponentActivity() {
             var noHp by remember { mutableStateOf("") }
 
             fun reset() {
-                username = "" ;
-                fullname = "" ;
-                email = "" ;
-                password = "" ;
+                username = "";
+                fullname = "";
+                email = "";
+                password = "";
                 noHp = "";
             }
 
-            fun registerKlik(){
-                if (username.isEmpty() || fullname.isEmpty() || email.isEmpty() || password.isEmpty() || noHp.isEmpty()) {
+            fun registerKlik() {
+                val isFull =
+                    username.isEmpty() && fullname.isEmpty() && email.isEmpty() && password.isEmpty() && noHp.isEmpty()
+
+                if (isFull) {
+                    registerUser(
+                        username.trim(),
+                        fullname.trim(),
+                        email.trim(),
+                        password.trim(),
+                        noHp.trim(),
+                        navController
+                    )
+                    reset()
+                } else {
                     isErrorDisplayed = true
                 }
-
-                registerUser(username.trim(), fullname.trim(), email.trim(), password.trim(), noHp.trim(), navController )
-                reset()
             }
 
-            fun loginKlik(){
-                if (username.isEmpty() || password.isEmpty()) {
+            fun loginKlik() {
+                val isFull = email.isNotEmpty() && password.isNotEmpty()
+
+                if (isFull) {
+                    loginUser(email.trim(), password.trim())
+                } else {
                     isErrorDisplayed = true
                 }
-
-                loginUser(email.trim(), password.trim())
             }
 
 
-            fun registerGoogle(){
-
+            fun registerGoogle() {
+                val signInIntent = googleSignInClient.signInIntent
+                startActivityForResult(signInIntent, RC_SIGN_IN)
             }
 
-            fun loginGoogle(){
-
+            fun loginGoogle() {
+                val signInIntent = googleSignInClient.signInIntent
+                startActivityForResult(signInIntent, RC_SIGN_IN)
             }
 
             DauRuangTheme {
@@ -134,8 +164,12 @@ class WelcomeActivity : ComponentActivity() {
                             LoginScreen(
                                 email = email,
                                 password = password,
-                                onEmailChange = { newValue -> email = newValue ; isErrorDisplayed = false },
-                                onPassChange = { newValue -> password = newValue ; isErrorDisplayed = false },
+                                onEmailChange = { newValue ->
+                                    email = newValue; isErrorDisplayed = false
+                                },
+                                onPassChange = { newValue ->
+                                    password = newValue; isErrorDisplayed = false
+                                },
 
                                 isErrorDisplayed = isErrorDisplayed,
 
@@ -144,12 +178,14 @@ class WelcomeActivity : ComponentActivity() {
                                 },
 
                                 onLoginGoogle = {
-
+                                    loginGoogle()
                                 },
 
                                 navigateToRegister = {
                                     navController.navigate("register") {
-                                        popUpTo("login") { inclusive = true ; isErrorDisplayed = false }
+                                        popUpTo("login") {
+                                            inclusive = true; isErrorDisplayed = false
+                                        }
                                     }
                                 },
 
@@ -164,11 +200,21 @@ class WelcomeActivity : ComponentActivity() {
                                 password = password,
                                 noHp = noHp,
 
-                                onUsernameChange = { newValue -> username = newValue ; isErrorDisplayed = false },
-                                onFullNameChange = { newValue -> fullname = newValue ; isErrorDisplayed = false },
-                                onEmailChange = { newValue -> email = newValue ; isErrorDisplayed = false },
-                                onPassChange = { newValue -> password = newValue ; isErrorDisplayed = false },
-                                onNoHpChange = { newValue -> noHp = newValue ; isErrorDisplayed = false },
+                                onUsernameChange = { newValue ->
+                                    username = newValue; isErrorDisplayed = false
+                                },
+                                onFullNameChange = { newValue ->
+                                    fullname = newValue; isErrorDisplayed = false
+                                },
+                                onEmailChange = { newValue ->
+                                    email = newValue; isErrorDisplayed = false
+                                },
+                                onPassChange = { newValue ->
+                                    password = newValue; isErrorDisplayed = false
+                                },
+                                onNoHpChange = { newValue ->
+                                    noHp = newValue; isErrorDisplayed = false
+                                },
 
                                 isErrorDisplayed = isErrorDisplayed,
 
@@ -186,7 +232,9 @@ class WelcomeActivity : ComponentActivity() {
                                 onClearHp = { noHp = "" },
                                 navigateToLogin = {
                                     navController.navigate("login") {
-                                        popUpTo("register") { inclusive = true ; isErrorDisplayed = false }
+                                        popUpTo("register") {
+                                            inclusive = true; isErrorDisplayed = false
+                                        }
                                     }
                                 }
                             )
@@ -195,12 +243,59 @@ class WelcomeActivity : ComponentActivity() {
                 }
             }
         }
+
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.your_web_client_id))
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
     }
 
-    // Login
+
+    // Login Google
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == RC_SIGN_IN){
+            // Menangani proses login googlekemarin
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                PreferenceAuthManager.saveToken(this, account.idToken!!)
+                firebaseAuthWithGoogle(account.idToken!!)
+            } catch (e: ApiException) {
+                e.printStackTrace()
+                Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
+            }
+
+        }
+    }
+
+    fun firebaseAuthWithGoogle(idToken: String){
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { login ->
+                if (login.isSuccessful) {
+                    Intent(this, MainActivity::class.java).also {
+                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it)
+                        Toast.makeText(this, "Login Google Berhasil", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Login Google Gagal", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
+    // Login custom
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) {login ->
+            .addOnCompleteListener(this) { login ->
                 if (login.isSuccessful) {
                     Intent(this, MainActivity::class.java).also {
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -214,22 +309,36 @@ class WelcomeActivity : ComponentActivity() {
 
     }
 
-    // Register
-    private fun registerUser(username: String, fullname: String, email: String , password: String, nohp: String, navController: NavController) {
+    // Register custom
+    private fun registerUser(
+        username: String,
+        fullname: String,
+        email: String,
+        password: String,
+        nohp: String,
+        navController: NavController
+    ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) {
                 if (it.isSuccessful) {
-                    saveUser(username , fullname, email, password, nohp, navController)
+                    saveUser(username, fullname, email, password, nohp, navController)
                 } else {
                     Toast.makeText(this, "Registrasi Gagal", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    private fun saveUser(username: String,fullname: String, email: String , password: String, nohp: String, navController: NavController){
+    private fun saveUser(
+        username: String,
+        fullname: String,
+        email: String,
+        password: String,
+        nohp: String,
+        navController: NavController
+    ) {
         val currentUserId = auth.currentUser!!.uid
         ref = FirebaseDatabase.getInstance().reference.child("USERS")
-        val userMap = HashMap<String,Any>()
+        val userMap = HashMap<String, Any>()
 
         userMap["id"] = currentUserId
         userMap["username"] = username
@@ -238,7 +347,7 @@ class WelcomeActivity : ComponentActivity() {
         userMap["password"] = password
         userMap["nohp"] = nohp
         ref.child(currentUserId).setValue(userMap).addOnCompleteListener {
-            if (it.isSuccessful){
+            if (it.isSuccessful) {
                 Toast.makeText(this, "Registrasi Berhasil", Toast.LENGTH_SHORT).show()
                 navController.navigate("login") {
                     popUpTo("register") { inclusive = true }
@@ -250,9 +359,7 @@ class WelcomeActivity : ComponentActivity() {
 
     }
 
-    companion object {
-        fun newIntent(context: Context) = Intent(context, WelcomeActivity::class.java)
-    }
+
 }
 
 
@@ -332,6 +439,7 @@ fun WelcomeScreen(
             }
         }
     }
+
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)

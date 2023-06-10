@@ -9,19 +9,27 @@ object DataDauruang {
     val tabMenu = listOf(
         TabMenu(
             id = 1,
-            title = "Botol"
+            title = "Botol",
+            latitude = -6.307143,
+            longtitude = 106.692525
         ),
         TabMenu(
             id = 2,
-            title = "Plastik"
+            title = "Plastik",
+            latitude = -4.307143,
+            longtitude = 106.692525
         ),
         TabMenu(
             id = 3,
-            title = "Kaca"
+            title = "Kaca",
+            latitude = -2.307143,
+            longtitude = 104.692525
         ),
         TabMenu(
             id = 4,
-            title = "Kertas"
+            title = "Kertas",
+            latitude = -7.307143,
+            longtitude = 102.692525
         )
     )
 
