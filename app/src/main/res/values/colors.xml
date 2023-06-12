@@ -11,6 +11,7 @@
     <!-- App Custom Color   -->
     <color name="green_primary">#28B446</color>
     <color name="text_primary">#374039</color>
+    <color name="orange_primary">#E8CD3F</color>
 
     <!-- Color Sampah   -->
     <color name="plastic_color_bg">#FFF0F0</color>

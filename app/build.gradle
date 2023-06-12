@@ -26,6 +26,9 @@ android {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         manifestPlaceholders = [MAPS_API_KEY: "${properties.getProperty('MAPS_API_KEY')}"]
+
+        buildConfigField 'String', 'API_BASE_URL', '"https://dauruang-b983c.et.r.appspot.com/order/"'
+        buildConfigField 'String', 'your_web_client_id', '"531323566310-t1v6tg6n6svriuhg2uc8j8trir6c76pi.apps.googleusercontent.com"'
     }
 
     buildTypes {
@@ -43,6 +46,7 @@ android {
     }
     buildFeatures {
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.5'
@@ -64,10 +68,6 @@ dependencies {
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.material3:material3'
-    implementation 'com.google.firebase:firebase-database:20.2.2'
-    implementation 'com.google.firebase:firebase-auth:22.0.0'
-    implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    implementation 'com.google.firebase:firebase-storage:20.1.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -113,4 +113,26 @@ dependencies {
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:32.1.0')
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-database:20.2.2'
+    implementation 'com.google.firebase:firebase-auth:22.0.0'
+    implementation 'com.google.firebase:firebase-storage:20.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+
+    // ViewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
+
+    // Dagger Hilt
+    implementation "com.google.dagger:hilt-android:2.39.1"
+    kapt "com.google.dagger:hilt-android-compiler:2.39.1"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+
+    implementation "androidx.compose.runtime:runtime-livedata:1.0.4"
 }

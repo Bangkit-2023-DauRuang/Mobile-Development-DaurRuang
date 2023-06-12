@@ -2,7 +2,10 @@ package com.capstone.dauruang.ui.screen.splash
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,20 +32,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.capstone.dauruang.MainActivity
 import com.capstone.dauruang.R
+import com.capstone.dauruang.data.local.PreferenceAuthManager
 import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
 import com.capstone.dauruang.ui.components.button.ButtonSmall
 import com.capstone.dauruang.ui.components.content.ContentSplash
 import com.capstone.dauruang.ui.theme.DauRuangTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SplashActivity : ComponentActivity() {
+
+    private lateinit var sharedPreferences: SharedPreferences
+
+    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val context: Context = this
+
+        sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+        val token = sharedPreferences.getString("token", null)
 
         setContent {
             DauRuangTheme {
@@ -57,7 +71,20 @@ class SplashActivity : ComponentActivity() {
 
         GlobalScope.launch(Dispatchers.Main) {
             delay(2000L)
-            startNextActivity()
+
+//            val verification = auth.currentUser?.isEmailVerified
+
+//            else if(verification == true){
+////                val user = auth.currentUser
+//            startActivity(Intent(context, MainActivity::class.java))
+
+            if( token != null){
+//                val verification = auth.currentUser?.isEmailVerified
+                // Toast.makeText(context, token.toString(), Toast.LENGTH_LONG).show()
+                startActivity(Intent(context, MainActivity::class.java))
+            } else {
+                startNextActivity()
+            }
         }
     }
 

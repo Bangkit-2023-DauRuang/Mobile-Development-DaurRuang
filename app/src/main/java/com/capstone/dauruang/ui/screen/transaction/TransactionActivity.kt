@@ -3,14 +3,19 @@ package com.capstone.dauruang.ui.screen.transaction
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
@@ -22,7 +27,11 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,23 +47,59 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.dauruang.R
+import com.capstone.dauruang.data.network.response.Orders
+import com.capstone.dauruang.model.User
+import com.capstone.dauruang.ui.ViewModelFactory
 import com.capstone.dauruang.ui.components.content.TitlePage
+import com.capstone.dauruang.ui.components.content.TransactionItem
 import com.capstone.dauruang.ui.nav.BottomNavTransaction
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class TransactionActivity : ComponentActivity() {
 
+    private val viewModel: TransactionViewModel by viewModels {
+        ViewModelFactory.getInstance(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
+            val orderListState: List<Orders> by viewModel.ordersResult.observeAsState(initial = emptyList())
+            val orderList: List<Orders> = orderListState
+
             TransactionScreen(
-                navigateBack = { onBackPressed() }
+                navigateBack = { onBackPressed() },
+                orderList = orderList ?: emptyList()
             )
+        }
+
+        setupViewModelObservers()
+    }
+
+    private fun setupViewModelObservers() {
+        viewModel.getAllOrdersData()
+
+        viewModel.errorMessage.observe(this) { errorMessage ->
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+            Log.e("Error nya disini ", errorMessage)
         }
     }
 
     companion object {
         fun newIntent(context: Context) = Intent(context, TransactionActivity::class.java)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setupViewModelObservers()
     }
 }
 
@@ -62,23 +107,36 @@ class TransactionActivity : ComponentActivity() {
 @Composable
 fun TransactionScreen(
     modifier: Modifier = Modifier,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    orderList: List<Orders>
 ) {
+
     val transScreenState = rememberSaveable { mutableStateOf(BottomNavTransaction.Diproses) }
-    var selectedIndex = remember { mutableStateOf(0) }
+    var selectedIndex = remember { mutableIntStateOf(0) }
     val context = LocalContext.current
+
+
+    val filteredOrderList = when (selectedIndex.value) {
+        0 -> orderList.filter { it.isPickedUp == false }
+        1 -> orderList.filter { it.isPickedUp == true }
+        2 -> orderList.filter { it.isPickedUp == null }
+        else -> orderList // Ketika selectedIndex tidak sesuai dengan kondisi yang ada, mengembalikan orderList utuh
+    }
+
 
     Scaffold(
         bottomBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colorResource(R.color.green_primary), shape = RoundedCornerShape(
-                        topStart = 24.dp,
-                        topEnd = 24.dp,
-                        bottomStart = 0.dp,
-                        bottomEnd = 0.dp
-                    ))
+                    .background(
+                        colorResource(R.color.green_primary), shape = RoundedCornerShape(
+                            topStart = 24.dp,
+                            topEnd = 24.dp,
+                            bottomStart = 0.dp,
+                            bottomEnd = 0.dp
+                        )
+                    )
                     .padding(top = 12.dp),
             ) {
                 var animate by remember { mutableStateOf(false) }
@@ -143,7 +201,9 @@ fun TransactionScreen(
         },
         content = { paddingValue ->
             Column(
-                modifier = modifier.padding(paddingValue).fillMaxHeight()
+                modifier = modifier
+                    .padding(paddingValue)
+                    .fillMaxHeight()
             ) {
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)) {
                     TitlePage(
@@ -151,12 +211,24 @@ fun TransactionScreen(
                         title = "Transaksi ${if (selectedIndex.value == 0) "Diproses" else if (selectedIndex.value == 1) "Selesai" else "Dibatalkan"}"
                     )
 
-                    // Loop
-                    Text(text = selectedIndex.value.toString())
+                    LazyColumn {
+                        items(filteredOrderList) { order ->
+                            TransactionItem(order = order)
+                        }
+                    }
                 }
             }
         }
     )
+}
+
+@Composable
+fun OrderItem(order: Orders) {
+    // Tampilkan informasi order
+    Text("Order ID: ${order.id}")
+    Text("Username: ${order.username}")
+    Text("Jenis Sampah: ${order.jenis_sampah}")
+    // Tambahkan informasi lainnya sesuai kebutuhan
 }
 
 @Composable
@@ -274,6 +346,6 @@ fun CustomMenuButtonTransaction(
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun TransactionPreview() {
-    TransactionScreen(navigateBack = {})
+//    TransactionScreen(navigateBack = {})
     CustomMenuButtonTransaction(text = "Diproses", selected = true)
 }
