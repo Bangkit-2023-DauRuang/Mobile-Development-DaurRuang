@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,8 +43,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +70,8 @@ import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.capstone.dauruang.R
 import com.capstone.dauruang.data.DataDauruang
+import com.capstone.dauruang.model.MapState
+import com.capstone.dauruang.model.ZoneClusterManager
 import com.capstone.dauruang.ui.components.content.TypeTrashCard
 import com.capstone.dauruang.ui.nav.BottomNavMainType
 import com.capstone.dauruang.ui.screen.history.HistoryActivity
@@ -73,10 +79,19 @@ import com.capstone.dauruang.ui.screen.profile.ProfileActivity
 import com.capstone.dauruang.ui.screen.scan.ScanActivity
 import com.capstone.dauruang.ui.screen.transaction.TransactionActivity
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MarkerInfoWindow
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +100,10 @@ fun HomeScreen(
     modifier: Modifier = Modifier
         .background(Color.White),
     name: String?,
-    photo: Uri?
+    photo: Uri?,
+    state: MapState,
+    setupClusterManager: (Context, GoogleMap) -> ZoneClusterManager,
+    calculateZoneViewCenter: () -> LatLngBounds,
 ) {
     val homeScreenState = rememberSaveable { mutableStateOf(BottomNavMainType.HOME) }
 
@@ -102,15 +120,18 @@ fun HomeScreen(
                     .padding(paddingValue)
                     .fillMaxSize()
             ) {
+                //INclude Tab Sampah
                 HeaderContent(context = context, name = name, photo = photo)
-
-                // TabLayout Sampah ad Map
 
                 // Bottom NavBar
                 Column(
                     verticalArrangement = Arrangement.Bottom
                 ) {
-                    MapsView()
+                    MapsView(
+                        state = state,
+                        setupClusterManager = setupClusterManager,
+                        calculateZoneViewCenter = calculateZoneViewCenter
+                    )
                 }
             }
         }
@@ -390,7 +411,7 @@ fun CustomMenuButtonMaps(
 
     Surface(
         color = when {
-            selected -> colorResource(R.color.green_primary).copy(alpha = 0.7f)
+            selected -> colorResource(R.color.green_primary).copy(alpha = 0.9f)
             else -> colorResource(R.color.green_transparant)
         },
         contentColor = when {
@@ -419,18 +440,28 @@ fun CustomMenuButtonMaps(
 }
 
 @Composable
-fun MapsView() {
+fun MapsView(
+    state: MapState,
+    setupClusterManager: (Context, GoogleMap) -> ZoneClusterManager,
+    calculateZoneViewCenter: () -> LatLngBounds,
+) {
     val context = LocalContext.current
     val mapView = rememberMapView()
 
-    var latitude by remember { mutableStateOf(49.110) }
-    var longitude by remember { mutableStateOf(-122.554) }
+    var latitude by remember { mutableDoubleStateOf(49.110) }
+    var longitude by remember { mutableDoubleStateOf(-122.554) }
 
     val tabMenu = remember { DataDauruang.tabMenu.filter { it.id > 0 } }
-    val selectedIndex = remember { mutableStateOf(0) }
+    val selectedIndex = remember { mutableIntStateOf(0) }
 
     val boxModifier = Modifier
         .fillMaxWidth()
+
+    // SetUp Maps
+    val mapProperties = MapProperties(
+        isMyLocationEnabled = state.lastKnownLocation != null,
+    )
+    val cameraPositionState = rememberCameraPositionState()
 
     Column(
         modifier = Modifier
@@ -454,30 +485,52 @@ fun MapsView() {
                     shape = RoundedCornerShape(12.dp)
                 )
         ) {
-            AndroidView(
-                factory = { mapView },
+            GoogleMap(
                 modifier = Modifier
-                        .fillMaxSize()
-            ) { view ->
-                val hasLocationPermission = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
+                        .fillMaxSize(),
+                properties = mapProperties,
+                cameraPositionState = cameraPositionState
+            ) {
 
-                MapsInitializer.initialize(context)
-                view.onCreate(null)
-                view.getMapAsync { googleMap ->
-                    googleMap.apply {
-
-                        // uiSettings.isZoomControlsEnabled = true
-
-                        val location = LatLng(latitude, longitude)
-                        addMarker(MarkerOptions().position(location).title("My Location"))
-                        moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12f))
-
-                        isMyLocationEnabled = hasLocationPermission
+                val context = LocalContext.current
+                val scope = rememberCoroutineScope()
+                MapEffect(state.clusterItems) { map ->
+                    if (state.clusterItems.isNotEmpty()) {
+                        val clusterManager = setupClusterManager(context, map)
+                        map.setOnCameraIdleListener(clusterManager)
+                        map.setOnMarkerClickListener(clusterManager)
+                        state.clusterItems.forEach { clusterItem ->
+                            map.addPolygon(clusterItem.polygonOptions)
+                        }
+                        map.setOnMapLoadedCallback {
+                            if (state.clusterItems.isNotEmpty()) {
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLngBounds(
+                                            calculateZoneViewCenter(),
+                                            0
+                                        ),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
+
+                MarkerInfoWindow(
+                    state = rememberMarkerState(position = LatLng(latitude, latitude)),
+                    snippet = "Some stuff",
+                    onClick = {
+                        // This won't work :(
+                        System.out.println("Mitchs_: Cannot be clicked")
+                        true
+                    },
+                    draggable = true,
+
+//                    state = rememberMarkerState(position = LatLng(49.1, -122.5)),
+
+                )
+
             }
 
             // Tab Menu Maps
@@ -503,6 +556,7 @@ fun MapsView() {
                                 selectedIndex.value = index
                                 latitude = tabMenu.latitude
                                 longitude = tabMenu.longtitude
+                                Toast.makeText(context, "${latitude} ${longitude}", Toast.LENGTH_LONG).show()
                             },
                         ) {
                             CustomMenuButtonMaps(
@@ -638,7 +692,7 @@ fun HomeScreenPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun MapViewPreview() {
-    MapsView()
+//    MapsView()
 }
 
 @Preview(showBackground = true)

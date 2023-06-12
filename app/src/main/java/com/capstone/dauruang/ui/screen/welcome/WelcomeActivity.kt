@@ -109,10 +109,9 @@ class WelcomeActivity : ComponentActivity() {
             }
 
             fun registerKlik() {
-                val isFull =
-                    username.isEmpty() && fullname.isEmpty() && email.isEmpty() && password.isEmpty() && noHp.isEmpty()
+                val isFull = username.isEmpty() && fullname.isEmpty() && email.isEmpty() && password.isEmpty() && noHp.isEmpty()
 
-                if (isFull) {
+                if (!isFull) {
                     registerUser(
                         username.trim(),
                         fullname.trim(),
@@ -223,7 +222,7 @@ class WelcomeActivity : ComponentActivity() {
                                 },
 
                                 onRegisterGoogle = {
-
+                                    registerGoogle()
                                 },
 
                                 onClearEmail = { email = "" },
@@ -260,7 +259,7 @@ class WelcomeActivity : ComponentActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == RC_SIGN_IN){
+        if (requestCode == RC_SIGN_IN) {
             // Menangani proses login googlekemarin
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -275,7 +274,7 @@ class WelcomeActivity : ComponentActivity() {
         }
     }
 
-    fun firebaseAuthWithGoogle(idToken: String){
+    fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { login ->
@@ -321,6 +320,8 @@ class WelcomeActivity : ComponentActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) {
                 if (it.isSuccessful) {
+                    auth.currentUser?.sendEmailVerification()
+                    Toast.makeText(this, "Verifikasi Email Anda", Toast.LENGTH_SHORT).show()
                     saveUser(username, fullname, email, password, nohp, navController)
                 } else {
                     Toast.makeText(this, "Registrasi Gagal", Toast.LENGTH_SHORT).show()
