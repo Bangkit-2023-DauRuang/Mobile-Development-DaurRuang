@@ -117,9 +117,9 @@ fun TransactionScreen(
 
 
     val filteredOrderList = when (selectedIndex.value) {
-        0 -> orderList.filter { it.isPickedUp == false }
-        1 -> orderList.filter { it.isPickedUp == true }
-        2 -> orderList.filter { it.isPickedUp == null }
+        0 -> orderList.filter { it.status_pemesanan == "Diproses" || it.status_pemesanan == "Pengecekan"  }
+        1 -> orderList.filter { it.status_pemesanan == "Selesai" }
+        2 -> orderList.filter { it.status_pemesanan == "Dibatalkan" }
         else -> orderList // Ketika selectedIndex tidak sesuai dengan kondisi yang ada, mengembalikan orderList utuh
     }
 

@@ -18,13 +18,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PunchClock
 import androidx.compose.material.icons.filled.SyncLock
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
@@ -43,6 +47,8 @@ import com.capstone.dauruang.R
 import com.capstone.dauruang.data.dummy.TransactionDummyProvider
 import com.capstone.dauruang.data.network.response.Orders
 import com.capstone.dauruang.model.Transaction
+import com.capstone.dauruang.ui.components.button.ButtonLargePrimary
+import com.capstone.dauruang.ui.components.button.ButtonSmall
 
 @Composable
 fun TransactionItem(
@@ -94,7 +100,7 @@ fun TransactionItem(
                         .align(Alignment.End)
                         .padding(bottom = 4.dp)
                 )
-                if (order.isPickedUp == true) {
+                if (order.status_pemesanan.toString() == "Selesai") {
                     Row(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(4.dp))
@@ -122,7 +128,8 @@ fun TransactionItem(
                         )
                     }
                 }
-                if (order.isPickedUp == false) {
+
+                if (order.status_pemesanan.toString() == "Diproses") {
                     Row(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(4.dp))
@@ -146,7 +153,31 @@ fun TransactionItem(
                     }
                 }
 
-                if (order.isPickedUp == null) {
+                if (order.status_pemesanan.toString() == "Pengecekan") {
+                    Row(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(4.dp))
+                            .background(colorResource(R.color.orange_primary))
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.AccessTime,
+                            contentDescription = "done_icons",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(14.dp)
+                        )
+                        Text(
+                            text = "pengecekan", fontSize = 10.sp,
+                            modifier = Modifier
+                                .padding(start = 2.dp),
+                            color = Color.White
+                        )
+                    }
+                }
+
+                if (order.status_pemesanan.toString() == "Dibatalkan") {
                     Row(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(4.dp))
@@ -256,11 +287,59 @@ fun TransactionItem(
                 order.catatan?.let { Text(text = it) }
             }
         }
+        if(order.status_pemesanan.toString() == "Pengecekan"){
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 12.dp, top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "menu",
+                    tint = colorResource(R.color.green_primary),
+                    modifier = Modifier
+                        .border(
+                            border = BorderStroke(2.dp, colorResource(R.color.green_primary)),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(7.dp)
+                )
+                TerimaUangButton(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .fillMaxWidth(),
+                    onClick = {}
+                )
+            }
+        }
         Divider(
             thickness = 1.dp,
             color = colorResource(R.color.green_primary),
             modifier = Modifier
                 .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun TerimaUangButton(
+    modifier: Modifier = Modifier
+        .fillMaxWidth(),
+    onClick: () -> Unit,
+){
+    Row(
+        modifier = modifier
+            .clickable { onClick }
+            .clip(RoundedCornerShape(8.dp))
+            .background(colorResource(R.color.green_primary))
+        ,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Terima Uang",
+            modifier = Modifier
+                .padding(horizontal = 12.dp , vertical = 10.dp),
+            color = Color.White
         )
     }
 }
@@ -275,7 +354,7 @@ fun TransactionPreview() {
         points = 10,
         lokasi_pengepul = "Kalimalang", lokasi_user = "Pondok kelapa",
         catatan = null,
-        isPickedUp = null,
+        status_pemesanan = "Pengecekan",
         createdAt = "2023-06-11T06:50:38.000Z",
         updatedAt = "2023-06-11T07:38:50.000Z"
     )

@@ -31,8 +31,8 @@ data class Orders(
     @field:SerializedName("catatan")
     val catatan: String?,
 
-    @field:SerializedName("isPickedUp")
-    val isPickedUp: Boolean?,
+    @field:SerializedName("status_pemesanan")
+    val status_pemesanan: String?,
 
     @field:SerializedName("createdAt")
     val createdAt: String?,

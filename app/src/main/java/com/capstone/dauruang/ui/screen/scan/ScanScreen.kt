@@ -1,8 +1,12 @@
 package com.capstone.dauruang.ui.screen.scan
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -32,10 +36,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LifecycleOwner
 import com.capstone.dauruang.ui.components.button.ButtonScan
 import com.capstone.dauruang.ui.components.content.TitlePage
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.Executor
@@ -51,7 +66,6 @@ fun ScanScreen(
     onImageCaptured: (Uri) -> Unit,
     onError: (ImageCaptureException) -> Unit
 ) {
-
     // 1 Persiapkan file file nya
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val context = LocalContext.current
@@ -95,7 +109,8 @@ fun ScanScreen(
                             outputDirectory = outputDirectory,
                             executor = executor,
                             onImageCaptured = onImageCaptured,
-                            onError = onError
+                            onError = onError,
+                            context = context
                         )
                     }
                 )
@@ -120,7 +135,6 @@ fun ScanScreen(
                     ) {
 
                         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
-//                        CameraPreview()
                     }
                 }
             }
@@ -130,34 +144,6 @@ fun ScanScreen(
 }
 
 
-//@Composable
-//fun CameraPreview() {
-//    val context = LocalContext.current
-//    val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-//
-//    AndroidView(factory = { context ->
-//        val previewView = PreviewView(context).apply {
-//            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-//        }
-//        val executor = ContextCompat.getMainExecutor(context)
-//        val cameraProvider = cameraProviderFuture.get()
-//        val preview = androidx.camera.core.Preview.Builder()
-//            .build()
-//            .also {
-//                it.setSurfaceProvider(previewView.surfaceProvider)
-//            }
-//        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-//
-//        cameraProvider.unbindAll()
-//        cameraProvider.bindToLifecycle(
-//            context as LifecycleOwner,
-//            cameraSelector,
-//            preview
-//        )
-//
-//        previewView
-//    }, modifier = Modifier.fillMaxSize())
-//}
 
 private fun takePhoto(
     filenameFormat: String,
@@ -165,7 +151,8 @@ private fun takePhoto(
     outputDirectory: File,
     executor: Executor,
     onImageCaptured: (Uri) -> Unit,
-    onError: (ImageCaptureException) -> Unit
+    onError: (ImageCaptureException) -> Unit,
+    context: Context
 ) {
 
     val photoFile = File(
@@ -187,6 +174,8 @@ private fun takePhoto(
         }
     })
 }
+
+
 
 private suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
     ProcessCameraProvider.getInstance(this).also { cameraProvider ->

@@ -16,15 +16,10 @@ class OrdersRepository @Inject constructor (private val apiService: ApiService) 
 
     private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
 
-    suspend fun getAllOrders(): List<Orders>? {
-        val response = apiService.getAllOrders()
-        if (response.isNotEmpty()) {
-            return response
-        } else {
-            // Handle error
-            return null
-        }
+    suspend fun getAllOrders(): Response<OrdersResponse>? {
+        return apiService.getAllOrders()
     }
+
 
 //    suspend fun getAllOrders(): List<Orders> {
 //        try {

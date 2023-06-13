@@ -33,9 +33,8 @@ class TransactionViewModel (private val repository: OrdersRepository ) : ViewMod
             try {
                 val response = repository.getAllOrders()
                 response?.let {listOrders ->
-//                    val orders = it
                     withContext(Dispatchers.Main) {
-                        _ordersResult.value = listOrders
+                        _ordersResult.value = listOrders.body()?.data
                     }
                 }
             } catch (e: Exception) {
