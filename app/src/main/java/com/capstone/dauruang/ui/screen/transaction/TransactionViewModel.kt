@@ -50,30 +50,3 @@ class TransactionViewModel (private val repository: OrdersRepository ) : ViewMod
     }
 }
 
-
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val response = repository.getAllOrders()
-//                Log.e("response", response.toString())
-//                val orders = response.body()?.data
-//                Log.e("orders", orders.toString())
-//                _ordersResult.postValue(orders)
-//                Log.e("ini datanya", ordersResult.value.toString())
-//            } catch (e: Exception) {
-//                _errorMessage.postValue(e.message)
-//                Log.e("Error Cok", ordersResult.value.toString())
-////                Log.e("kalau ini gmna ?", repository.getAllOrders().toString())
-//            }
-//        }
-//            runCatching {
-//
-//            }.onSuccess { orders ->
-//                withContext(Dispatchers.Main) {
-//
-//                }
-//            }.onFailure { throwable ->
-//                withContext(Dispatchers.Main) {
-//                    _errorMessage.value = throwable.message
-//                    Log.e("error cok", errorMessage.value.toString())
-//                }
-//            }

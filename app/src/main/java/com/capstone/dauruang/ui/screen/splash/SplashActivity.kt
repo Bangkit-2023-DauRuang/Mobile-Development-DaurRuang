@@ -82,8 +82,10 @@ class SplashActivity : ComponentActivity() {
 //                val verification = auth.currentUser?.isEmailVerified
                 // Toast.makeText(context, token.toString(), Toast.LENGTH_LONG).show()
                 startActivity(Intent(context, MainActivity::class.java))
+                finish()
             } else {
                 startNextActivity()
+                finish()
             }
         }
     }

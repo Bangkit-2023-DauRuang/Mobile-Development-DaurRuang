@@ -1,6 +1,7 @@
 package com.capstone.dauruang.ui.screen.scan
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -44,6 +47,8 @@ import com.capstone.dauruang.MainActivity
 import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.content.InfoScanCard
 import com.capstone.dauruang.ui.screen.home.HomeScreen
+import com.capstone.dauruang.ui.screen.profile.ProfileActivity
+import com.capstone.dauruang.ui.screen.transaction.TransactionSummaryActivity
 import com.capstone.dauruang.ui.theme.DauRuangTheme
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -53,6 +58,7 @@ import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -84,6 +90,7 @@ class ScanActivity: ComponentActivity() {
             Log.i("kilo", "Permission denied")
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,6 +147,14 @@ class ScanActivity: ComponentActivity() {
                                     description = "Daurkan ${label.value} mu untuk keberlangsungan yang lebih baik",
                                     navigateNext = {
 
+                                        // Toast.makeText(this@ScanActivity, "Ini Uri : ${photoUri}", Toast.LENGTH_SHORT).show()
+
+                                        // Membuat Intent
+                                        val intent = Intent(this@ScanActivity, TransactionSummaryActivity::class.java)
+                                        intent.putExtra("imageUri", photoUri)
+                                        intent.putExtra("label", label.value.toString())
+                                        // Menjalankan activity tujuan
+                                        startActivity(intent)
                                     },
                                     onScanClick = {
                                         val intent = Intent(this@ScanActivity, ScanActivity::class.java)
@@ -276,11 +291,6 @@ class ScanActivity: ComponentActivity() {
 
         return predictedClass ?: "Unknown"
     }
-
-
-
-
-
 
 
 
