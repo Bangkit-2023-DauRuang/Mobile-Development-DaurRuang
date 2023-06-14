@@ -82,9 +82,9 @@ class ProfileActivity: ComponentActivity() {
         auth = FirebaseAuth.getInstance()
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
 
-        val name = firebaseUser?.displayName
-        val email = firebaseUser?.email
-        val photo = firebaseUser?.photoUrl
+        val name = firebaseUser.displayName
+        val email = firebaseUser.email
+        val photo = firebaseUser.photoUrl
 
         val database = FirebaseDatabase.getInstance()
         val uid = FirebaseAuth.getInstance().currentUser?.uid

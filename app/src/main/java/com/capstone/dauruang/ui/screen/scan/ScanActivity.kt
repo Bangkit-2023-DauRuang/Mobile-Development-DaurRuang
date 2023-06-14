@@ -155,6 +155,7 @@ class ScanActivity: ComponentActivity() {
                                         intent.putExtra("label", label.value.toString())
                                         // Menjalankan activity tujuan
                                         startActivity(intent)
+                                        finish()
                                     },
                                     onScanClick = {
                                         val intent = Intent(this@ScanActivity, ScanActivity::class.java)
