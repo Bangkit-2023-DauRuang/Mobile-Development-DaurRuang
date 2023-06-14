@@ -1,4 +1,52 @@
 package com.capstone.dauruang.ui.screen.transaction
 
-class TransactionViewModel {
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.capstone.dauruang.data.network.repository.OrdersRepository
+import com.capstone.dauruang.data.network.response.Orders
+import com.capstone.dauruang.data.network.response.OrdersResponse
+import com.capstone.dauruang.data.network.retrofit.ApiConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class TransactionViewModel (private val repository: OrdersRepository ) : ViewModel() {
+
+    private val _ordersResult = MutableLiveData<List<Orders>>()
+    val ordersResult: LiveData<List<Orders>> = _ordersResult
+
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = _errorMessage
+
+    init {
+        getAllOrdersData()
+    }
+
+    fun getAllOrdersData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getAllOrders()
+                response?.let {listOrders ->
+                    withContext(Dispatchers.Main) {
+                        _ordersResult.value = listOrders.body()?.data
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _errorMessage.value = e.message
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val TAG = TransactionViewModel::class.java.simpleName
+    }
 }
+

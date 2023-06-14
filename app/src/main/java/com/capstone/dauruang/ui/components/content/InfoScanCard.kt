@@ -27,7 +27,7 @@ fun InfoScanCard (
     modifier: Modifier = Modifier,
     titleTrash: String,
     description: String,
-    color: Color,
+    color: Color = colorResource(R.color.plastic_color_bg),
     onScanClick: () -> Unit,
     navigateNext: () -> Unit
 ) {

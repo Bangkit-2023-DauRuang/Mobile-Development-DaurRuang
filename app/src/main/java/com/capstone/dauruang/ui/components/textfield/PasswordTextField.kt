@@ -114,7 +114,7 @@ fun PasswordTextField(
 
         if(isError){
             Text(
-                text = "Email tidak boleh kosong",
+                text = "Password tidak boleh kosong",
                 color = Color.Red,
                 fontSize = 10.sp,
                 modifier = Modifier.padding(start = 52.dp, top = 2.dp)
