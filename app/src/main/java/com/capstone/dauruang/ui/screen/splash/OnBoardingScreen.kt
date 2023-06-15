@@ -1,5 +1,6 @@
 package com.capstone.dauruang.ui.screen.splash
 
+import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,8 +37,8 @@ fun OnBoardingScreen() {
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun OnBoardingContent(){
-    var currentPage by remember { mutableStateOf(0)}
+fun OnBoardingContent() {
+    var currentPage by remember { mutableStateOf(0) }
     var pagerState = rememberPagerState { onboardingList.size }
 
     val context = LocalContext.current
@@ -59,8 +60,8 @@ fun OnBoardingContent(){
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 12.dp)
-            ){
-                Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally){
+            ) {
+                Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(modifier = Modifier, horizontalArrangement = Arrangement.Center) {
                         onboardingList.forEachIndexed { index, _ ->
                             OnboardingPagerSlide(
@@ -71,12 +72,15 @@ fun OnBoardingContent(){
                         }
                     }
 
-                    if(pagerState.currentPage == 2){
+                    if (pagerState.currentPage == 2) {
                         ButtonLargePrimary(
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp, top = 12.dp)
                                 .fillMaxWidth(),
-                            navigateButton = { context.startActivity(WelcomeActivity.newIntent(context)) },
+                            navigateButton = {
+                                context.startActivity(WelcomeActivity.newIntent(context))
+                                (context as? Activity)?.finish()
+                            },
                             title = "NEXT",
                             fontWeight = FontWeight.Medium
                         )
@@ -90,19 +94,20 @@ fun OnBoardingContent(){
 }
 
 data class Onboard(val title: String, val description: String, val imageFile: Int)
+
 val onboardingList = listOf(
     Onboard(
-        "Semua Bisa\n"+"Daur Ulang",
+        "Semua Bisa\n" + "Daur Ulang",
         "Dengan mendaur ulang kamu ikut serta dalam menyelamatkan dari rusaknya lingkungan",
         R.drawable.splash_image_one
     ),
     Onboard(
-        "Mudah Jual Limbah\n"+"Lingkungan",
+        "Mudah Jual Limbah\n" + "Lingkungan",
         "Menjual sampah dengan tepat dan dapatkan uangnya",
         R.drawable.splash_image_second
     ),
     Onboard(
-        "Daurkan dan\n"+"Uangkan ",
+        "Daurkan dan\n" + "Uangkan ",
         "Jangan diamkan limbah mu tidak berguna",
         R.drawable.splash_image_third
     )

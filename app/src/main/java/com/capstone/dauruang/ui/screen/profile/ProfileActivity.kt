@@ -147,6 +147,8 @@ class ProfileActivity: ComponentActivity() {
                             emailProfile = email.toString(),
                             point = 23,
                             logOut = {
+                                auth.signOut()
+                                val uid = null
                                 logOut()
                             }
                         )

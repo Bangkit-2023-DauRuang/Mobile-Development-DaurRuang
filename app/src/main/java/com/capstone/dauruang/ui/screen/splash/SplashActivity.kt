@@ -72,15 +72,12 @@ class SplashActivity : ComponentActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             delay(2000L)
 
-//            val verification = auth.currentUser?.isEmailVerified
-
-//            else if(verification == true){
-////                val user = auth.currentUser
-//            startActivity(Intent(context, MainActivity::class.java))
-
-            if( token != null){
-//                val verification = auth.currentUser?.isEmailVerified
+            val verification = auth.currentUser?.uid
+            if( verification != null){
                 // Toast.makeText(context, token.toString(), Toast.LENGTH_LONG).show()
+                startActivity(Intent(context, MainActivity::class.java))
+                finish()
+            } else if(token != null) {
                 startActivity(Intent(context, MainActivity::class.java))
                 finish()
             } else {
