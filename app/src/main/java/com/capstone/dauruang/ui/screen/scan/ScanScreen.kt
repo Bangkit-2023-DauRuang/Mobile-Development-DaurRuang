@@ -103,6 +103,7 @@ fun ScanScreen(
                 ButtonScan(
                     eventClick = {
                         Log.i("kilo", "ON CLICK")
+                        Toast.makeText(context, "Mantapss, Gambar masih diproses", Toast.LENGTH_SHORT).show()
                         takePhoto(
                             filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                             imageCapture = imageCapture,

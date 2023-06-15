@@ -23,6 +23,9 @@ class TransactionViewModel (private val repository: OrdersRepository ) : ViewMod
     private val _ordersResult = MutableLiveData<List<Orders>>()
     val ordersResult: LiveData<List<Orders>> = _ordersResult
 
+    private val _ordersUserResult = MutableLiveData<List<Orders>>()
+    val ordersUserResult: LiveData<List<Orders>> = _ordersUserResult
+
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
@@ -40,6 +43,23 @@ class TransactionViewModel (private val repository: OrdersRepository ) : ViewMod
                 response?.let {listOrders ->
                     withContext(Dispatchers.Main) {
                         _ordersResult.value = listOrders.body()?.data
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _errorMessage.value = e.message
+                }
+            }
+        }
+    }
+
+    fun getUserOrdersData(email: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getOrdersByEmail(email)
+                response?.let {listOrders ->
+                    withContext(Dispatchers.Main) {
+                        _ordersUserResult.value = listOrders.body()?.data
                     }
                 }
             } catch (e: Exception) {

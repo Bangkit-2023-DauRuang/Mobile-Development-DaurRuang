@@ -98,6 +98,7 @@ class TransactionSummaryActivity : ComponentActivity() {
         auth = FirebaseAuth.getInstance()
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
         val name = firebaseUser.displayName
+        val email = firebaseUser.email
 
         intent?.let {
             imageUri = it.getParcelableExtra("imageUri")
@@ -121,7 +122,7 @@ class TransactionSummaryActivity : ComponentActivity() {
             val suggestionsBerat = listOf(1, 2, 3, 4, 5)
             var selectedBerat by remember { mutableIntStateOf(0) }
             var textfieldSizeBerat by remember { mutableStateOf(suggestions[0]) }
-            var totalHarga by remember { mutableIntStateOf(selectedBerat*7500) }
+            var hargaPerKil0 by remember { mutableIntStateOf(if(selectedText.toString() == "Logam") 13000 else if(selectedText.toString() == "Kertas") 5000 else if(selectedText.toString() == "Minyak") 9500 else 3000 ) }
 
             // Lokasi Daur Ulang
             var expandedLokasi by remember { mutableStateOf(false) }
@@ -159,7 +160,8 @@ class TransactionSummaryActivity : ComponentActivity() {
 
                                     if(isValid){
                                         val request = OrderTransactionRequest(
-                                            username = name.toString(),
+                                            username = if(name.isNullOrEmpty()) email.toString() else name.toString(),
+                                            email = email.toString()  ,
                                             jenis_sampah = selectedText,
                                             berat_sampah = selectedBerat,
                                             lokasi_pengepul = selectedTextLokasi,
@@ -298,6 +300,15 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                             text = { Text(text = label) },
                                                             onClick = {
                                                                 selectedText = label
+                                                                if(label == suggestions[0]){
+                                                                    hargaPerKil0 = 13000
+                                                                } else if (label == suggestions[1]){
+                                                                    hargaPerKil0 = 5000
+                                                                } else if (label == suggestions[2]){
+                                                                    hargaPerKil0 = 9500
+                                                                } else if (label == suggestions[3]){
+                                                                    hargaPerKil0 = 3000
+                                                                }
                                                                 expanded = false
                                                             }
                                                         )
@@ -363,7 +374,7 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     text = nama_sampah,
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
-                                                    modifier = Modifier.width(160.dp),
+                                                    modifier = Modifier.width(130.dp),
                                                     color = colorResource(R.color.text_secondary)
                                                 )
                                                 Text(
@@ -373,13 +384,14 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     color = colorResource(R.color.text_secondary)
                                                 )
                                                 Text(
-                                                    text = "@ Rp. 7.500",
+                                                    text = "@ Rp. ${hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
-                                                    color = colorResource(R.color.text_secondary)
+                                                    color = colorResource(R.color.text_secondary),
+                                                    modifier = Modifier.padding(horizontal = 2.dp)
                                                 )
                                                 Text(
-                                                    text = "Rp. " + "${selectedBerat*7500}",
+                                                    text = "Rp. " + "${selectedBerat*hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
                                                     color = colorResource(R.color.text_secondary)
@@ -407,7 +419,7 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     color = colorResource(R.color.text_primary),
                                                 )
                                                 Text(
-                                                    text = "Rp. " + "${selectedBerat*7500}",
+                                                    text = "Rp. " + "${selectedBerat * hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = colorResource(R.color.text_primary),

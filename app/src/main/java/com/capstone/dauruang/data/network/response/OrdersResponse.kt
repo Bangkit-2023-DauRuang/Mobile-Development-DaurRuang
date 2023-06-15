@@ -9,6 +9,9 @@ data class Orders(
     @field:SerializedName("username")
     val username: String?,
 
+    @field:SerializedName("email")
+    val email: String?,
+
     @field:SerializedName("jenis_sampah")
     val jenis_sampah: String?,
 
@@ -55,6 +58,7 @@ data class OrderTransactionData(
     val status_pemesanan: String,
     val id: Int,
     val username: String,
+    val email: String,
     val jenis_sampah: String,
     val hargaPerKg: Int,
     val berat_sampah: Int,

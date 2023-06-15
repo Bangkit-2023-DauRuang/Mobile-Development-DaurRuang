@@ -23,6 +23,10 @@ class OrdersRepository @Inject constructor (private val apiService: ApiService) 
         return apiService.getAllOrders()
     }
 
+    suspend fun getOrdersByEmail(email:String): Response<OrdersResponse>? {
+        return apiService.getUserOrders(email)
+    }
+
     suspend fun createOrder(request: OrderTransactionRequest): Response<OrderTransactionResponse>? {
         return apiService.createOrder(request)
     }

@@ -57,12 +57,18 @@ import com.capstone.dauruang.ui.ViewModelFactory
 import com.capstone.dauruang.ui.components.content.TitlePage
 import com.capstone.dauruang.ui.components.content.TransactionItem
 import com.capstone.dauruang.ui.nav.BottomNavTransaction
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TransactionActivity : ComponentActivity() {
+
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firebaseUser: FirebaseUser
 
     private val viewModel: TransactionViewModel by viewModels {
         ViewModelFactory.getInstance(this)
@@ -71,21 +77,48 @@ class TransactionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        auth = FirebaseAuth.getInstance()
+        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+        val name = firebaseUser.displayName
+        val email = firebaseUser.email
+
         setContent {
-            val orderListState: List<Orders> by viewModel.ordersResult.observeAsState(initial = emptyList())
+//             val orderListState: List<Orders> by viewModel.ordersResult.observeAsState(initial = emptyList())
+            val orderListState: List<Orders> by viewModel.ordersUserResult.observeAsState(initial = emptyList())
             val orderList: List<Orders> = orderListState
 
             TransactionScreen(
                 navigateBack = { onBackPressed() },
-                orderList = orderList ?: emptyList()
+                orderList = orderList ?: emptyList(),
+                name = name.toString(),
+                email = email.toString()
             )
         }
 
-        setupViewModelObservers()
+        if (email != null) {
+            setupViewModelObservers(email)
+        }
+
+//        setupViewModelObservers()
     }
 
-    private fun setupViewModelObservers() {
-        viewModel.getAllOrdersData()
+//    private fun setupViewModelObservers() {
+//         viewModel.getAllOrdersData()
+//
+//        viewModel.errorMessage.observe(this) { errorMessage ->
+//            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+//            Log.e("Error nya disini ", errorMessage)
+//        }
+//    }
+
+//    override fun onResume() {
+//        super.onResume()
+//        setupViewModelObservers()
+//    }
+
+    private fun setupViewModelObservers(email: String) {
+
+        viewModel.getUserOrdersData(email)
 
         viewModel.errorMessage.observe(this) { errorMessage ->
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
@@ -93,13 +126,18 @@ class TransactionActivity : ComponentActivity() {
         }
     }
 
-    companion object {
-        fun newIntent(context: Context) = Intent(context, TransactionActivity::class.java)
-    }
 
     override fun onResume() {
         super.onResume()
-        setupViewModelObservers()
+
+        val emailUser = FirebaseAuth.getInstance().currentUser!!.email
+        emailUser?.let { setupViewModelObservers(it) }
+    }
+
+
+
+    companion object {
+        fun newIntent(context: Context) = Intent(context, TransactionActivity::class.java)
     }
 }
 
@@ -108,7 +146,9 @@ class TransactionActivity : ComponentActivity() {
 fun TransactionScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-    orderList: List<Orders>
+    orderList: List<Orders>,
+    name: String,
+    email: String
 ) {
 
     val transScreenState = rememberSaveable { mutableStateOf(BottomNavTransaction.Diproses) }

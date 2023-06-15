@@ -6,6 +6,9 @@ data class OrderTransactionRequest(
     @SerializedName("username")
     val username: String,
 
+    @SerializedName("email")
+    val email: String,
+
     @SerializedName("jenis_sampah")
     val jenis_sampah: String,
 

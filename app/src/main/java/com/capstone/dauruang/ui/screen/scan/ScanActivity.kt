@@ -48,8 +48,13 @@ import com.capstone.dauruang.R
 import com.capstone.dauruang.ui.components.content.InfoScanCard
 import com.capstone.dauruang.ui.screen.home.HomeScreen
 import com.capstone.dauruang.ui.screen.profile.ProfileActivity
+import com.capstone.dauruang.ui.screen.transaction.TransactionActivity
 import com.capstone.dauruang.ui.screen.transaction.TransactionSummaryActivity
 import com.capstone.dauruang.ui.theme.DauRuangTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.image.TensorImage
@@ -113,7 +118,6 @@ class ScanActivity: ComponentActivity() {
                     }
 
                     if (shouldShowPhoto.value) {
-
                         val bitmap = uriToBitmap(photoUri)
                         val hasil = bitmap?.let { ouputGenerator(it) }
                         label.value = hasil.toString()
