@@ -89,7 +89,7 @@ fun TransactionItem(
                     Column() {
                         Text(text = ": ${order.berat_sampah} Kg")
                         Text(text = ": ${order.points} Point")
-                        Text(text = ": Rp. ${order.hargaPerKg}", fontWeight = FontWeight.SemiBold)
+                        Text(text = ": @ Rp. ${order.hargaPerKg}", fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -351,6 +351,7 @@ fun TransactionPreview() {
     val data = Orders(
         id = 1, username = "Rahmawati", jenis_sampah = "Minyak jelantah", hargaPerKg = 9500,
         berat_sampah = 10,
+        email = "davidkrb52@gmail.com",
         points = 10,
         lokasi_pengepul = "Kalimalang", lokasi_user = "Pondok kelapa",
         catatan = null,

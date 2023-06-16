@@ -1,7 +1,6 @@
 package com.capstone.dauruang.data.network.response
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.http.Query
 
 data class Orders(
     @field:SerializedName("id")
@@ -9,6 +8,9 @@ data class Orders(
 
     @field:SerializedName("username")
     val username: String?,
+
+    @field:SerializedName("email")
+    val email: String?,
 
     @field:SerializedName("jenis_sampah")
     val jenis_sampah: String?,
@@ -46,16 +48,24 @@ data class OrdersResponse(
     val data: List<Orders>
 )
 
+// Response for post order
+data class OrderTransactionResponse(
+    val message: String,
+    val data: OrderTransactionData
+)
 
-
-//@Query("id") id: Int? = null,
-//@Query("username") username: Int? = null,
-//@Query("jenis_sampah") jenis_sampah: Int? = null,
-//@Query("hargaPerKg") hargaPerKg: Int? = null,
-//@Query("points") points: Int? = null,
-//@Query("lokasi_pengepul") lokasi_pengepul: String? = null,
-//@Query("lokasi_pengepul") lokasi_user: String? = null,
-//@Query("catatan") catatan: String? = null,
-//@Query("isPickedUp") isPickedUp: Boolean? = null,
-//@Query("createdAt") createdAt : String? = null,
-//@Query("updatedAt") updatedAt : String? = null
+data class OrderTransactionData(
+    val status_pemesanan: String,
+    val id: Int,
+    val username: String,
+    val email: String,
+    val jenis_sampah: String,
+    val hargaPerKg: Int,
+    val berat_sampah: Int,
+    val points: Int,
+    val lokasi_pengepul: String,
+    val lokasi_user: String,
+    val catatan: String,
+    val updatedAt: String,
+    val createdAt: String
+)

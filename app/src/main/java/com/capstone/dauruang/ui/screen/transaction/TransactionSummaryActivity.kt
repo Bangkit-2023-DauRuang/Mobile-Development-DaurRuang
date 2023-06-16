@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -42,6 +44,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -58,22 +61,45 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import coil.compose.rememberAsyncImagePainter
 import com.capstone.dauruang.R
+import com.capstone.dauruang.data.network.request.OrderTransactionRequest
+import com.capstone.dauruang.ui.ViewModelFactory
 import com.capstone.dauruang.ui.components.button.ButtonSummaryPrimary
 import com.capstone.dauruang.ui.components.button.ButtonSummarySecondary
 import com.capstone.dauruang.ui.components.content.TitlePage
+import com.capstone.dauruang.ui.components.modal.ModalFailed
+import com.capstone.dauruang.ui.components.modal.ModalSuccess
 import com.capstone.dauruang.ui.screen.scan.ScanActivity
 import com.capstone.dauruang.ui.theme.DauRuangTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class TransactionSummaryActivity : ComponentActivity() {
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firebaseUser: FirebaseUser
+
+    private val viewModel: TransactionViewModel by viewModels {
+        ViewModelFactory.getInstance(this)
+    }
 
     private var imageUri: Uri? = null
     private var label: String? = null
 
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+        firebaseUser = FirebaseAuth.getInstance().currentUser!!
+        val name = firebaseUser.displayName
+        val email = firebaseUser.email
+
         intent?.let {
             imageUri = it.getParcelableExtra("imageUri")
             label = it.getStringExtra("label")
@@ -96,13 +122,16 @@ class TransactionSummaryActivity : ComponentActivity() {
             val suggestionsBerat = listOf(1, 2, 3, 4, 5)
             var selectedBerat by remember { mutableIntStateOf(0) }
             var textfieldSizeBerat by remember { mutableStateOf(suggestions[0]) }
-            var totalHarga by remember { mutableIntStateOf(selectedBerat*7500) }
+            var hargaPerKil0 by remember { mutableIntStateOf(if(selectedText.toString() == "Logam") 13000 else if(selectedText.toString() == "Kertas") 5000 else if(selectedText.toString() == "Minyak") 9500 else 3000 ) }
 
             // Lokasi Daur Ulang
             var expandedLokasi by remember { mutableStateOf(false) }
             val suggestionsLokasi = listOf("Kebon Jeruk", "Tebet", "Setiabudi", "Cempaka Putih", "Kelapa Gading")
             var selectedTextLokasi by remember { mutableStateOf(suggestionsLokasi[0]) }
             var textfieldSizeLokasi by remember { mutableStateOf(suggestions[0]) }
+
+            // Modal
+            val showDialogState = remember { mutableStateOf(false) }
 
             val icon = if (expanded)
                 Icons.Filled.ArrowDropUp //it requires androidx.compose.material:material-icons-extended
@@ -113,9 +142,11 @@ class TransactionSummaryActivity : ComponentActivity() {
                 Text(text = "Ini percobaan")
                 Scaffold(
                     bottomBar = {
-                        Column(modifier = Modifier.padding(end = 12.dp, start = 12.dp, bottom = 12.dp).background(
-                            Color.White
-                        )) {
+                        Column(modifier = Modifier
+                            .padding(end = 12.dp, start = 12.dp, bottom = 12.dp)
+                            .background(
+                                Color.White
+                            )) {
                             BottomBarSummary(
                                 modifier = Modifier.padding(horizontal = 20.dp),
                                 onClickBatalkan = {
@@ -125,6 +156,56 @@ class TransactionSummaryActivity : ComponentActivity() {
                                 },
                                 onClickJemputLimbah = {
 
+                                    val isValid = name.toString().isNotEmpty() && selectedText.isNotEmpty() && selectedBerat.toString().isNotEmpty() && selectedTextLokasi.toString().isNotEmpty() && alamat_penjemputan.toString().isNotEmpty() && catatan.toString().isNotEmpty()
+
+                                    if(isValid){
+                                        val request = OrderTransactionRequest(
+                                            username = if(name.isNullOrEmpty()) email.toString() else name.toString(),
+                                            email = email.toString()  ,
+                                            jenis_sampah = selectedText,
+                                            berat_sampah = selectedBerat,
+                                            lokasi_pengepul = selectedTextLokasi,
+                                            lokasi_user = alamat_penjemputan,
+                                            catatan = catatan
+                                        )
+                                        viewModel.createOrder(request)
+                                        showDialogState.value = true
+                                        if (showDialogState.value) {
+                                            setContent {
+                                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                                    ModalSuccess(
+                                                        durationMillis = 5000L, // Durasi modal 3 detik
+                                                        onDismiss = { showDialogState.value = false }
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            delay(3000) // Menunda selama 5 detik
+                                            val intent = Intent(this@TransactionSummaryActivity, TransactionActivity::class.java)
+                                            startActivity(intent)
+                                            finish()
+                                        }
+                                    } else if(!isValid) {
+                                        showDialogState.value = true
+                                        if (showDialogState.value) {
+                                            setContent {
+                                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                                    ModalFailed(
+                                                        durationMillis = 3000L, // Durasi modal 3 detik
+                                                        onDismiss = { showDialogState.value = false }
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            delay(3000) // Menunda selama 5 detik
+                                            finish()
+                                        }
+                                    }
+                                    observeOrderResult()
+                                    observeErrorMessage()
                                 }
                             )
                         }
@@ -219,6 +300,15 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                             text = { Text(text = label) },
                                                             onClick = {
                                                                 selectedText = label
+                                                                if(label == suggestions[0]){
+                                                                    hargaPerKil0 = 13000
+                                                                } else if (label == suggestions[1]){
+                                                                    hargaPerKil0 = 5000
+                                                                } else if (label == suggestions[2]){
+                                                                    hargaPerKil0 = 9500
+                                                                } else if (label == suggestions[3]){
+                                                                    hargaPerKil0 = 3000
+                                                                }
                                                                 expanded = false
                                                             }
                                                         )
@@ -284,7 +374,7 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     text = nama_sampah,
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
-                                                    modifier = Modifier.width(160.dp),
+                                                    modifier = Modifier.width(130.dp),
                                                     color = colorResource(R.color.text_secondary)
                                                 )
                                                 Text(
@@ -294,13 +384,14 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     color = colorResource(R.color.text_secondary)
                                                 )
                                                 Text(
-                                                    text = "@ Rp. 7.500",
+                                                    text = "@ Rp. ${hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
-                                                    color = colorResource(R.color.text_secondary)
+                                                    color = colorResource(R.color.text_secondary),
+                                                    modifier = Modifier.padding(horizontal = 2.dp)
                                                 )
                                                 Text(
-                                                    text = "Rp. " + "${selectedBerat*7500}",
+                                                    text = "Rp. " + "${selectedBerat*hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Light,
                                                     color = colorResource(R.color.text_secondary)
@@ -328,7 +419,7 @@ class TransactionSummaryActivity : ComponentActivity() {
                                                     color = colorResource(R.color.text_primary),
                                                 )
                                                 Text(
-                                                    text = "Rp. " + "${selectedBerat*7500}",
+                                                    text = "Rp. " + "${selectedBerat * hargaPerKil0}",
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = colorResource(R.color.text_primary),
@@ -404,6 +495,7 @@ class TransactionSummaryActivity : ComponentActivity() {
                 )
             }
         }
+
     }
 
     companion object {
@@ -424,6 +516,22 @@ class TransactionSummaryActivity : ComponentActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
             null
+        }
+    }
+
+    private fun observeOrderResult() {
+        viewModel.orderResultTransaction.observe(this) { orderData ->
+            // Handle order data result
+            setContent {
+            }
+        }
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.errorMessage.observe(this) { errorMessage ->
+            setContent {
+
+            }
         }
     }
 }
