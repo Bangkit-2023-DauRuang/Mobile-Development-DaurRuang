@@ -30,13 +30,13 @@ In summary, "DauRuang" is a platform to make people more careful and aware about
 ### Result Of this Project
 
 1. **Splash Screen**
-   ![DauRuang App](img/Readme/2.png)
+   ![DauRuang App](img/1.jpg)
 
 2. **Login & Register Screen**
-   ![DauRuang App](img/1.png)
+   ![DauRuang App](img/2.jpg)
 
 3. **Home, Scan & Summary Screen**
-   ![DauRuang App](img/3.png)
+   ![DauRuang App](img/3.jpg)
 
 4. **Transaction Screen**
    ![DauRuang App](img/4.png)
