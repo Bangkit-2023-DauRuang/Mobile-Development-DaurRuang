@@ -141,6 +141,7 @@ class TransactionSummaryActivity : ComponentActivity() {
             DauRuangTheme {
                 Text(text = "Ini percobaan")
                 Scaffold(
+                    containerColor = Color.White,
                     bottomBar = {
                         Column(modifier = Modifier
                             .padding(end = 12.dp, start = 12.dp, bottom = 12.dp)
@@ -216,12 +217,14 @@ class TransactionSummaryActivity : ComponentActivity() {
                                 onBackPressed()
                             },
                             title = "Summary Limbah Sampah",
-                            modifier = Modifier.padding(
-                                end = 16.dp,
-                                start = 16.dp,
-                                bottom = 12.dp,
-                                top = 8.dp
-                            )
+                            modifier = Modifier
+                                .padding(
+                                    end = 16.dp,
+                                    start = 16.dp,
+                                    bottom = 12.dp,
+                                    top = 8.dp
+                                )
+                                .background(Color.White)
                         )
                     },
                     content = { paddingValues ->
@@ -271,7 +274,11 @@ class TransactionSummaryActivity : ComponentActivity() {
                                             Box() {
                                                 OutlinedTextField(
                                                     readOnly = true,
-                                                    value = selectedText,
+                                                    value = selectedText.also {
+                                                        colorResource(
+                                                            R.color.text_primary
+                                                        )
+                                                    },
                                                     onValueChange = { selectedText = it },
                                                     modifier = Modifier
                                                         .fillMaxWidth()
@@ -325,7 +332,11 @@ class TransactionSummaryActivity : ComponentActivity() {
                                             Box() {
                                                 OutlinedTextField(
                                                     readOnly = true,
-                                                    value = selectedBerat.toString(),
+                                                    value = selectedBerat.toString().also {
+                                                        colorResource(
+                                                            R.color.text_primary
+                                                        )
+                                                    },
                                                     onValueChange = { selectedBerat = it.toInt() },
                                                     modifier = Modifier
                                                         .fillMaxWidth()
@@ -432,7 +443,11 @@ class TransactionSummaryActivity : ComponentActivity() {
                                         Box() {
                                             OutlinedTextField(
                                                 readOnly = true,
-                                                value = selectedTextLokasi,
+                                                value = selectedTextLokasi.also {
+                                                    colorResource(
+                                                        R.color.text_primary
+                                                    )
+                                                },
                                                 onValueChange = { selectedTextLokasi = it },
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -545,16 +560,18 @@ fun CustomTFSummary(
     modifier: Modifier = Modifier.fillMaxWidth(),
     label: String = "",
 ) {
-    val borderColor =
-        if (isSystemInDarkTheme()) Color.White else colorResource(R.color.text_primary)
-    val textColor = if (isSystemInDarkTheme()) Color.White else colorResource(R.color.text_primary)
+    val borderColor =colorResource(R.color.text_primary)
+    val textColor = colorResource(R.color.text_primary)
+
+//    val borderColor =if (isSystemInDarkTheme()) Color.White else colorResource(R.color.text_primary)
+//    val textColor = if (isSystemInDarkTheme()) Color.White else colorResource(R.color.text_primary)
 
     OutlinedTextField(
-        value = value,
+        value = value.also { colorResource(R.color.text_primary) },
         onValueChange = onValueChange,
         modifier = modifier,
-        label = { Text(text = label) },
-        shape = RoundedCornerShape(12.dp)
+        label = { Text(text = label, color = textColor) },
+        shape = RoundedCornerShape(12.dp),
     )
 }
 
@@ -576,6 +593,7 @@ fun BottomBarSummary(
         .height(100.dp)
         .fillMaxWidth()
         .shadow(4.dp, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+        .background(Color.White)
 
 ) {
     Row(modifier = Modifier) {
